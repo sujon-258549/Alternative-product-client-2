@@ -1,4 +1,4 @@
-import { Menu } from "lucide-react";
+import { LogInIcon, Menu } from "lucide-react";
 
 import {
   Accordion,
@@ -126,28 +126,29 @@ const Navbar = ({
             </DropdownMenu>
 
             <Button
-              className="border border-white text-white p-5"
+              className="border bg-[#424242]  ml-2.5 rounded-md border-white text-white p-4"
               style={{ boxShadow: "1px 1px 10px" }}
             >
-              <a href={auth.login.url}>{auth.login.title}</a>
+              <a href={auth.login.url}>{auth.login.title}</a>{" "}
+              <LogInIcon className="ml-3" />
             </Button>
           </div>
         </nav>
 
         {/* Mobile Menu */}
-        <div className="block lg:hidden">
+        <div className="block lg:hidden ">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <a href={logo.url} className="flex items-center gap-2">
               <img src={logo.src} className="max-h-8" alt={logo.alt} />
             </a>
             <Sheet>
-              <SheetTrigger asChild>
+              <SheetTrigger className="text-white" asChild>
                 <Button variant="outline" size="icon">
                   <Menu className="size-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
+              <SheetContent className="overflow-y-auto bg-white">
                 <SheetHeader>
                   <SheetTitle>
                     <a href={logo.url} className="flex items-center gap-2">
@@ -164,7 +165,7 @@ const Navbar = ({
                     {menu.map((item) => renderMobileMenuItem(item))}
                   </Accordion>
 
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col bg-[#424242] text-white rounded-md gap-3">
                     <Button asChild variant="outline">
                       <a href={auth.login.url}>{auth.login.title}</a>
                     </Button>
@@ -234,10 +235,10 @@ const renderMobileMenuItem = (item: MenuItem) => {
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
     <a
-      className="flex flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
+      className="flex text-white flex-row gap-4 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
       href={item.url}
     >
-      <div className="text-foreground">{item.icon}</div>
+      <div className="text-foreground ">{item.icon}</div>
       <div>
         <div className="text-sm font-semibold">{item.title}</div>
         {item.description && (

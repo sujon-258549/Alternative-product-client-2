@@ -25,11 +25,11 @@ const RadialProgressbar = () => {
   };
 
   return (
-    <>
-      <h1 className="text-3xl  text-white md:text-5xl font-bold text-center py-10 mt-10">
+    <div className="container">
+      <h1 className="text-3xl  text-white md:text-5xl font-bold text-center py-5 md:py-10 mt-10">
         Our Services Progress Bar
       </h1>
-      <div className="p-0.5 mb-10 md:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
+      <div className="p-0.5 mb-0 px-4 md:mb-10 lg:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:gap-10">
         <div>
           <h2 className="text-2xl text-white md:text-3xl text-center font-bold py-5">
@@ -82,7 +82,7 @@ const RadialProgressbar = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

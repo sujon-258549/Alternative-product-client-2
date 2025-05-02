@@ -3,9 +3,9 @@ import CountUp from "react-countup";
 
 const Counter = () => {
   return (
-    <div>
-      <div className="px-2 py-20 w-full flex justify-center">
-        <div className="bg-white lg:mx-8 lg:flex lg:max-w-5xl lg:shadow-lg rounded-lg">
+    <div className="container">
+      <div className="md:py-10 lg:py-20 w-full flex justify-center">
+        <div className="bg-white lg:mx-6 lg:flex lg:max-w-5xl lg:shadow-lg rounded-lg">
           <div className="lg:w-1/2">
             <div
               className="lg:scale-110 h-80 bg-cover lg:h-full rounded-b-none border lg:rounded-lg"
@@ -42,13 +42,15 @@ const Counter = () => {
           </div>
         </div>
       </div>
-      <div className="pt-10 pb-10 md:pb-20">
-        <h1 className="text-3xl py-10  md:text-5xl font-bold text-center text-white font-rancho">
+      <div className=" md:pt-10 pb-10 md:pb-20">
+        <h1 className="py-10  md:text-5xl font-bold text-center text-white font-rancho">
           {" "}
           Our Count Up{" "}
         </h1>
-        <div className="p-0.5 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
-        <div className="max-w-screen-xl mx-auto p-5 sm:p-10 md:p-16">
+        <div className="mx-5">
+          <div className="p-0.5 max-w-md mx-auto  bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
+        </div>
+        <div className="mt-5 md:mt-10 lg:mt-20">
           <div className="rounded overflow-hidden flex flex-col">
             <a href="#">
               <img
