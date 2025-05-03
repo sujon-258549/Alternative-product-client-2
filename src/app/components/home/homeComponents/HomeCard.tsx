@@ -152,7 +152,7 @@ export function HomeCard() {
           </h1>
           <div className="p-0.5 mb-0 px-4   max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
         </div>
-
+        {/* comment test */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project, index) => (
             <div
