@@ -67,8 +67,8 @@ const Navbar = ({
     { title: "Home", url: "#" },
 
     {
-      title: "Pricing",
-      url: "#",
+      title: "Add Product",
+      url: "/add-product",
     },
     {
       title: "Blog",
@@ -76,11 +76,11 @@ const Navbar = ({
     },
   ],
   auth = {
-    login: { title: "Login", url: "#" },
+    login: { title: "Login", url: "/login" },
   },
 }: Navbar1Props) => {
   return (
-    <section className="py-4  ">
+    <section className="py-4 border-b border-white ">
       <div className="container">
         {/* Desktop Menu */}
         <nav className="hidden justify-between items-center lg:flex">
@@ -109,7 +109,7 @@ const Navbar = ({
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="mt-5 w-[220px] bg-white ">
+              <DropdownMenuContent className="mt-4 w-[220px] bg-white ">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-black" />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
@@ -126,7 +126,7 @@ const Navbar = ({
             </DropdownMenu>
 
             <Button
-              className="border bg-[#424242]  ml-2.5 rounded-md border-white text-white p-4"
+              className="border bg-[#BB9D09]  ml-2.5 rounded-md border-white text-white p-4"
               style={{ boxShadow: "1px 1px 10px" }}
             >
               <a href={auth.login.url}>{auth.login.title}</a>{" "}
@@ -165,7 +165,7 @@ const Navbar = ({
                     {menu.map((item) => renderMobileMenuItem(item))}
                   </Accordion>
 
-                  <div className="flex flex-col bg-[#424242] text-white rounded-md gap-3">
+                  <div className="flex flex-col bg-[#BB9D09] text-white rounded-md gap-3">
                     <Button asChild variant="outline">
                       <a href={auth.login.url}>{auth.login.title}</a>
                     </Button>

@@ -3,19 +3,19 @@ import { Flat } from "@alptugidin/react-circular-progress-bar";
 
 const RadialProgressbar = () => {
   const progressBarStyle = {
-    strokeColor: "#16a34a",
-    barWidth: 8,
+    strokeColor: "yellow",
+    barWidth: 10,
     bgStrokeColor: "#ffffff",
     bgColor: { value: "#000000", transparency: "20" },
     shape: "full",
     strokeLinecap: "round",
     valueSize: 10,
     valueWeight: "bold",
-    valueColor: "#fff",
+    valueColor: "yellow",
     valueFamily: "Trebuchet MS",
     textSize: 13,
     textWeight: "bold",
-    textColor: "#fff",
+    textColor: "yellow",
     textFamily: "Trebuchet MS",
     loadingTime: 1000,
     miniCircleColor: "#ff0000",
@@ -32,7 +32,7 @@ const RadialProgressbar = () => {
       <div className="p-0.5 mb-0 px-4 md:mb-10 lg:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:gap-10">
         <div>
-          <h2 className="text-2xl text-white md:text-3xl text-center font-bold py-5">
+          <h2 className="text-2xl text-yellow-400 md:text-3xl text-center font-bold py-5">
             Our Recommended
           </h2>
           <div className="w-48 mx-auto">
@@ -49,7 +49,7 @@ const RadialProgressbar = () => {
         </div>
 
         <div>
-          <h2 className="text-2xl md:text-3xl text-white text-center font-bold py-5">
+          <h2 className="text-2xl md:text-3xl text-yellow-400 text-center font-bold py-5">
             Our Product Add
           </h2>
           <div className="w-48 mx-auto">
@@ -66,7 +66,7 @@ const RadialProgressbar = () => {
         </div>
 
         <div>
-          <h2 className="text-2xl md:text-3xl text-white text-center font-bold py-5">
+          <h2 className="text-2xl md:text-3xl text-yellow-400 text-center font-bold py-5">
             Our Services
           </h2>
           <div className="w-48 mx-auto">

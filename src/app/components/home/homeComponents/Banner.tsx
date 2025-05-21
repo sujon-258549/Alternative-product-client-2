@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import ShowAllProductButton from "./ShowAllProductButton";
 
 const Banner = () => {
   return (
@@ -39,7 +38,7 @@ const Banner = () => {
                 <h1 className="text-3xl text-white font-semibold lg:text-4xl">
                   Don,t use a wild one all the time
                   <br /> your{" "}
-                  <span className="text-blue-500">
+                  <span className="text-yellow-500">
                     That product will not always be in the market
                   </span>
                 </h1>
@@ -56,12 +55,7 @@ const Banner = () => {
                   development,.
                 </p>
 
-                <Link to={"/allproduct"}>
-                  <Button className="text-white shadow mt-10 p-5">
-                    {" "}
-                    Show All Product
-                  </Button>
-                </Link>
+                <ShowAllProductButton />
               </div>
             </div>
 

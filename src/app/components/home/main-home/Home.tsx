@@ -1,7 +1,8 @@
 import Banner from "../homeComponents/Banner";
 import Counter from "../homeComponents/Counter";
-import { HomeCard } from "../homeComponents/HomeCard";
+import HomeCard from "../homeComponents/HomeCard";
 import RadialProgressbar from "../homeComponents/RadialProgressbar";
+import RecommendationSection from "../homeComponents/RecommendationSection";
 import Slider from "../homeComponents/Slider";
 
 const Home = () => {
@@ -12,6 +13,7 @@ const Home = () => {
       <RadialProgressbar />
       <Banner />
       <Counter />
+      <RecommendationSection />
     </div>
   );
 };
