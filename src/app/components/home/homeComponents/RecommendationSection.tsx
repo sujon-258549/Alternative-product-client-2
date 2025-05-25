@@ -328,7 +328,7 @@ const RecommendationSection = () => {
             <p className="text-sm text-gray-300 line-clamp-2 my-2">
               {recommendation.shortDescription.slice(0, 20)}
             </p>
-            <button className="mt-2 w-full bg-yellow-400 text-black text-sm py-2 rounded-lg hover:bg-yellow-500 transition-all">
+            <button className="mt-2 w-full  text-sm py-2 rounded-lg btn-bg transition-all">
               Details
             </button>
           </div>
@@ -337,7 +337,7 @@ const RecommendationSection = () => {
       <div className="flex justify-center items-center pb-5 md:pb-14 lg:pb-20">
         {recommendations.length >= 12 && (
           <Link to={"/allproduct"}>
-            <Button className="bg-yellow-400 text-black mt-10 p-5">
+            <Button className="btn-bg mt-10 p-5">
               {" "}
               Show All Recommendation
             </Button>

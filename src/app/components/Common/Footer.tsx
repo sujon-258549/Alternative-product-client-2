@@ -2,7 +2,10 @@ import { Link } from "react-router";
 
 export function Footer() {
   return (
-    <footer style={{ boxShadow: "2px 2px 25px #fff" }} className="py-10 ">
+    <footer
+      style={{ boxShadow: "2px 2px 25px #fff" }}
+      className="py-10 md:-mb-10"
+    >
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="space-y-4">

@@ -15,7 +15,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { z } from "zod";
-import { productSchema } from "./productZonValidation";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -24,11 +23,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "./Category";
+import { productSchema } from "../product/productZonValidation";
+import { categories } from "../product/Category";
 
 type ProductFormValues = z.infer<typeof productSchema>;
-
-const ProductForm = () => {
+const RecommendationFrom = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -80,26 +79,26 @@ const ProductForm = () => {
   };
 
   return (
-    <div className="min-h-screen py-10 flex justify-center items-center bg-gray-900">
-      <div className="max-w-4xl w-full mx-4 bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-yellow-400">
-            Add New Product
-          </h2>
-          <p className="text-gray-300 mt-2">
-            Fill in the details below to add a new product to your inventory
+    <div className="max-w-4xl mx-auto px-4 rounded-md">
+      <div className="bg-gray-800 p-4 my-10 md:p-8 rounded-xl shadow-lg border border-gray-700">
+        <div>
+          <h3 className="text-center text-2xl font-bold text-yellow-400 mb-4">
+            Add Recommendation Product
+          </h3>
+          <p className="text-gray-300 text-center mb-6">
+            Fill in the details below to add a Recommendation product to your
+            inventory
           </p>
         </div>
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
               {/* Product Name */}
               <FormField
                 control={form.control}
                 name="productName"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="sm:col-span-2">
                     <FormLabel className="text-gray-300">
                       Product Name
                     </FormLabel>
@@ -131,6 +130,35 @@ const ProductForm = () => {
                         disabled={isLoading}
                       />
                     </FormControl>
+                    <FormMessage className="text-red-400" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Categories */}
+              <FormField
+                control={form.control}
+                name="categories"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-300">Category</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-96 overflow-y-auto">
+                        {categories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
@@ -211,35 +239,6 @@ const ProductForm = () => {
                 )}
               />
 
-              {/* Categories */}
-              <FormField
-                control={form.control}
-                name="categories"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-300">Category</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-96 overflow-y-auto">
-                        {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-red-400" />
-                  </FormItem>
-                )}
-              />
-
               {/* Weight */}
               <FormField
                 control={form.control}
@@ -295,7 +294,7 @@ const ProductForm = () => {
                 control={form.control}
                 name="isInStock"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-700 p-4">
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-700 p-4 sm:col-span-2">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
@@ -311,115 +310,117 @@ const ProductForm = () => {
                   </FormItem>
                 )}
               />
-            </div>
 
-            {/* Short Description */}
-            <FormField
-              control={form.control}
-              name="shortDescription"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">
-                    Short Description
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter a short description"
-                      {...field}
-                      className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-400" />
-                </FormItem>
-              )}
-            />
-
-            {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">
-                    Full Description
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Enter detailed product description"
-                      {...field}
-                      className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 min-h-[120px]"
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-400" />
-                </FormItem>
-              )}
-            />
-
-            {/* Product Photo */}
-            <FormField
-              control={form.control}
-              name="productUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-300">Product Photo</FormLabel>
-                  <FormControl>
-                    <div className="relative">
+              {/* Short Description */}
+              <FormField
+                control={form.control}
+                name="shortDescription"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2">
+                    <FormLabel className="text-gray-300">
+                      Short Description
+                    </FormLabel>
+                    <FormControl>
                       <Input
-                        id="productUrl"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}
-                        ref={field.ref}
-                        onBlur={field.onBlur}
+                        placeholder="Enter a short description"
+                        {...field}
+                        className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                        disabled={isLoading}
                       />
-                      <Label
-                        htmlFor="productUrl"
-                        className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-600 bg-gray-700 hover:bg-gray-600 transition-colors"
-                      >
-                        {previewImage ? (
-                          <div className="relative h-full w-full">
-                            <img
-                              src={previewImage}
-                              alt="Preview"
-                              className="h-full w-full object-contain p-2"
-                            />
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                removeImage();
-                              }}
-                              className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                            >
-                              <FaTimes size={14} />
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center p-4 text-center">
-                            <FaFileDownload className="mb-3 text-4xl text-gray-400" />
-                            <span className="text-gray-300 font-medium">
-                              Click to upload or drag and drop
-                            </span>
-                            <span className="text-sm text-gray-400 mt-1">
-                              PNG, JPG, JPEG (max. 5MB)
-                            </span>
-                          </div>
-                        )}
-                      </Label>
-                    </div>
-                  </FormControl>
-                  <FormMessage className="text-red-400" />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage className="text-red-400" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Description */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2">
+                    <FormLabel className="text-gray-300">
+                      Full Description
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter detailed product description"
+                        {...field}
+                        className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 min-h-[120px]"
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-400" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Product Photo */}
+              <FormField
+                control={form.control}
+                name="productUrl"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2">
+                    <FormLabel className="text-gray-300">
+                      Product Photo
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          id="productUrl"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageChange}
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                        />
+                        <Label
+                          htmlFor="productUrl"
+                          className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-600 bg-gray-700 hover:bg-gray-600 transition-colors"
+                        >
+                          {previewImage ? (
+                            <div className="relative h-full w-full">
+                              <img
+                                src={previewImage}
+                                alt="Preview"
+                                className="h-full w-full object-contain p-2"
+                              />
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeImage();
+                                }}
+                                className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                              >
+                                <FaTimes size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-4 text-center">
+                              <FaFileDownload className="mb-3 text-4xl text-gray-400" />
+                              <span className="text-gray-300 font-medium">
+                                Click to upload or drag and drop
+                              </span>
+                              <span className="text-sm text-gray-400 mt-1">
+                                PNG, JPG, JPEG (max. 5MB)
+                              </span>
+                            </div>
+                          )}
+                        </Label>
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-red-400" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-lg transition-colors"
+              className="w-full btn-bg text-white font-bold py-3 rounded-lg transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -457,4 +458,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm;
+export default RecommendationFrom;

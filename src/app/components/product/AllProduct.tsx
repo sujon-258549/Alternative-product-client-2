@@ -1,5 +1,8 @@
 import { Button } from "@/components/ui/button";
-import ShowAllProductButton from "./ShowAllProductButton";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 const datas = [
   {
     productName: "Wireless Earbuds Pro",
@@ -231,50 +234,147 @@ const datas = [
     isDigital: false,
   },
 ];
-const HomeCard = () => {
+const AllProduct = () => {
   return (
-    <div className="container">
-      <h1 className="text-3xl  text-white md:text-5xl font-bold text-center py-5 md:py-10 mt-10">
-        Product
-      </h1>
-      <div className="p-0.5 mb-0 px-4 md:mb-10 lg:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
-      <div className=" mb-5 md:mb-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
-        {datas.slice(0, 12).map((product, idx) => (
-          <div
-            key={idx}
-            className="border rounded-2xl bg-[#424242] p-3 shadow hover:shadow-lg transition-all duration-300 flex flex-col"
-          >
-            <img
-              src={product.productUrl}
-              alt={product.productName}
-              className="w-full h-48 md:h-44 lg:h-32 object-cover rounded-xl mb-3"
-            />
-            <h2 className="text-lg font-semibold line-clamp-1 text-white">
-              {product.productName.slice(0, 10)}
-            </h2>
-            <p className="text-sm text-gray-300 mb-1">{product.brandName}</p>
-            <p className="text-base font-bold text-green-600">
-              ${product.price.toFixed(2)}{" "}
-              {product.originalPrice !== undefined && (
-                <span className="text-sm text-gray-400 line-through">
-                  ${product.originalPrice.toFixed(2)}
-                </span>
-              )}
-            </p>
-            <p className="text-sm text-gray-300 line-clamp-2 my-2">
-              {product.shortDescription.slice(0, 20)}
-            </p>
-            <Button className="mt-2 w-full     text-sm py-2 rounded-lg btn-bg transition-all">
-              Recommended
-            </Button>
+    <section className="mb-10 md:mb-20">
+      <div className="container">
+        <h1 className="text-3xl btn-bg rounded-md mb-5 md:mb-10 text-white md:text-5xl font-bold text-center py-5 md:py-10 mt-10">
+          All Product
+        </h1>
+        <div className="flex gap-5">
+          <Card className="p-6 space-y-8 bg-white">
+            {/* Price Range */}
+            <div className="space-y-4">
+              <h3 className="font-medium">Price Range</h3>
+              <Slider
+                defaultValue={[0, 425955]}
+                min={0}
+                max={425955}
+                step={1000}
+                className="w-full"
+              />
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>0</span>
+                <span>425,955</span>
+              </div>
+            </div>
+
+            {/* Availability */}
+            <div className="space-y-3">
+              <h3 className="font-medium">Availability</h3>
+              <div className="space-y-2">
+                {["In Stock", "Pre Order", "Up Coming"].map((option) => (
+                  <div key={option} className="flex items-center space-x-2">
+                    <Checkbox id={`availability-${option}`} />
+                    <Label htmlFor={`availability-${option}`}>{option}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Processor */}
+            <div className="space-y-3">
+              <h3 className="font-medium">Processor</h3>
+              <div className="space-y-2">
+                {["Intel", "AMD", "Apple"].map((brand) => (
+                  <div key={brand} className="flex items-center space-x-2">
+                    <Checkbox id={`processor-${brand}`} />
+                    <Label htmlFor={`processor-${brand}`}>{brand}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* RAM */}
+            <div className="space-y-3">
+              <h3 className="font-medium">RAM</h3>
+              <div className="space-y-2">
+                {["2 GB", "4 GB", "8 GB", "16 GB", "32 GB", "64 GB"].map(
+                  (ram) => (
+                    <div key={ram} className="flex items-center space-x-2">
+                      <Checkbox id={`ram-${ram}`} />
+                      <Label htmlFor={`ram-${ram}`}>{ram}</Label>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* SSD */}
+            <div className="space-y-3">
+              <h3 className="font-medium">SSD</h3>
+              <div className="space-y-2">
+                {["256GB SSD", "512GB SSD", "1TB SSD", "2TB SSD"].map((ssd) => (
+                  <div key={ssd} className="flex items-center space-x-2">
+                    <Checkbox id={`ssd-${ssd}`} />
+                    <Label htmlFor={`ssd-${ssd}`}>{ssd}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Graphics */}
+            <div className="space-y-3">
+              <h3 className="font-medium">Graphics</h3>
+              <div className="space-y-2">
+                {[
+                  "Shared / Integrated",
+                  "Dedicated 2GB",
+                  "Dedicated 4GB",
+                  "Dedicated 6GB",
+                  "Dedicated 8GB",
+                  "Dedicated 12GB",
+                  "Dedicated 16GB",
+                  "Dedicated 24GB",
+                  "Dedicated 32GB",
+                ].map((gpu) => (
+                  <div key={gpu} className="flex items-center space-x-2">
+                    <Checkbox id={`gpu-${gpu}`} />
+                    <Label htmlFor={`gpu-${gpu}`}>{gpu}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          <div className=" mb-5 md:mb-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
+            {datas.slice(0, 12).map((product, idx) => (
+              <div
+                key={idx}
+                className="border rounded-2xl bg-[#424242] p-3 shadow hover:shadow-lg transition-all duration-300 flex flex-col"
+              >
+                <img
+                  src={product.productUrl}
+                  alt={product.productName}
+                  className="w-full h-48 md:h-44 lg:h-32 object-cover rounded-xl mb-3"
+                />
+                <h2 className="text-lg font-semibold line-clamp-1 text-white">
+                  {product.productName.slice(0, 10)}
+                </h2>
+                <p className="text-sm text-gray-300 mb-1">
+                  {product.brandName}
+                </p>
+                <p className="text-base font-bold text-green-600">
+                  ${product.price.toFixed(2)}{" "}
+                  {product.originalPrice !== undefined && (
+                    <span className="text-sm text-gray-400 line-through">
+                      ${product.originalPrice.toFixed(2)}
+                    </span>
+                  )}
+                </p>
+                <p className="text-sm text-gray-300 line-clamp-2 my-2">
+                  {product.shortDescription.slice(0, 20)}
+                </p>
+                <Button className="mt-2 w-full btn-bg text-sm py-2 rounded-lg  transition-all">
+                  Recommended
+                </Button>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
-      <div className="flex justify-center items-center">
-        {datas.length >= 12 && <ShowAllProductButton />}
-      </div>
-    </div>
+    </section>
   );
 };
 
-export default HomeCard;
+export default AllProduct;
