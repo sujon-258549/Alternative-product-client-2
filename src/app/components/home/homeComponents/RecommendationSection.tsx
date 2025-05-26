@@ -292,10 +292,10 @@ const recommendations = [
 const RecommendationSection = () => {
   return (
     <div className="container mx-auto px-4">
-      <h1 className="text-3xl text-white md:text-5xl font-bold text-center py-5 md:py-10 mt-10">
+      <h1 className="text-3xl  text-white md:text-5xl font-bold text-center py-5 md:py-10">
         Recommended Products
       </h1>
-      <div className="p-0.5 mb-0 px-4 md:mb-10 lg:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm" />
+      <div className="p-0.5  mb-6  px-4 md:mb-10 lg:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm" />
 
       <div className="mb-5 md:mb-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
         {recommendations.slice(0, 12).map((recommendation) => (

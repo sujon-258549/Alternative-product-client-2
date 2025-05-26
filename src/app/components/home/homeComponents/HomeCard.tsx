@@ -242,7 +242,7 @@ const HomeCard = () => {
         {datas.slice(0, 12).map((product, idx) => (
           <div
             key={idx}
-            className="border rounded-2xl bg-[#424242] p-3 shadow hover:shadow-lg transition-all duration-300 flex flex-col"
+            className="rounded-2xl  bg-[#424242] p-3 shadow hover:shadow-lg transition-all duration-300 flex flex-col"
           >
             <img
               src={product.productUrl}

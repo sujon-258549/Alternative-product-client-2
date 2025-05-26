@@ -9,6 +9,8 @@ import RecommendationFrom from "../Recomendaction/RecomendationFrom";
 import RecommendationDetails from "../AllDetails/RecommendationDetails";
 import MyProduct from "../product/MyProduct";
 import AllProduct from "../product/AllProduct";
+import AboutPage from "../AboutPage/AboutPage";
+import DocumentationPage from "../AboutPage/DocumentationPage";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +33,15 @@ const router = createBrowserRouter([
         path: "/My-product",
         element: <MyProduct />,
       },
+      {
+        path: "/about-page",
+        element: <AboutPage />,
+      },
+      {
+        path: "/about-documentation",
+        element: <DocumentationPage />,
+      },
+
       {
         path: "/product-details",
         element: <ProductDetails />,

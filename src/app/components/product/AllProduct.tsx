@@ -59,7 +59,7 @@ const AllProduct = () => {
         </h1>
         <div className="flex gap-5">
           {/* Filters Sidebar */}
-          <Card className="p-6 space-y-8 bg-white min-w-[250px]">
+          <Card className="p-6 space-y-8 bg-[#424242] text-white min-w-[250px]">
             {/* Price Range */}
             <div className="space-y-4">
               <h3 className="font-medium">Price Range</h3>
@@ -69,7 +69,7 @@ const AllProduct = () => {
                 min={0}
                 max={maxPrice}
                 step={1}
-                className="w-full bg-yellow-500 text-yellow-800 font-bold rounded-md"
+                className="w-full bg-yellow-500 text-yellow-200 font-bold rounded-md"
               />
               {/* <SliderTrack className="bg-transparent h-3 rounded-full">
                 <SliderRange className="bg-[#f24822] h-3 rounded-full" />
