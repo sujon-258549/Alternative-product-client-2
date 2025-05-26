@@ -11,6 +11,8 @@ import MyProduct from "../product/MyProduct";
 import AllProduct from "../product/AllProduct";
 import AboutPage from "../AboutPage/AboutPage";
 import DocumentationPage from "../AboutPage/DocumentationPage";
+import ProtectedRoute from "./ProtectedRoute";
+import UserProfile from "../user/UserProfile";
 
 const router = createBrowserRouter([
   {
@@ -23,7 +25,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/add-product",
-        element: <ProductForm />,
+        element: (
+          <ProtectedRoute>
+            <ProductForm />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <UserProfile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/all-product",

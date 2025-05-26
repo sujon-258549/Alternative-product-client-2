@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,30 +13,64 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginSchema } from "./schema/login";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { setUser } from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/features/hooks";
+import { verifyToken } from "@/utility/varifyToken";
+import { toast } from "sonner";
+// import { toast } from "sonner";
 
 const Login = () => {
   const [passwordHideAndShow, setPasswordHideAndShow] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const dispatch = useAppDispatch();
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "sujan25854@gmail.com",
+      password: "123456",
     },
   });
-
+  const [userLogin] = useLoginMutation();
+  const navigate = useNavigate();
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const toastId = toast.loading("Logging in...", { duration: 2000 });
     setIsLoading(true);
+
     try {
-      console.log(data);
-      // Add your login logic here (e.g., API call)
-      // await loginUser(data);
-    } catch (error) {
+      const res = await userLogin(data).unwrap();
+
+      if (!res.data?.accessToken) {
+        throw new Error(
+          res.data?.message || "Login failed. No access token received."
+        );
+      }
+
+      const userInfo = verifyToken(res.data.accessToken);
+
+      if (!userInfo) {
+        throw new Error("Invalid token. Please try again.");
+      }
+
+      dispatch(
+        setUser({
+          user: { userInfo },
+          token: res.data.accessToken,
+        })
+      );
+
+      toast.success("Login successful!", { id: toastId });
+      navigate("/", { replace: true }); // Prevents going back to login
+    } catch (error: any) {
       console.error("Login failed:", error);
+      const errorMessage =
+        error?.data?.message ||
+        error.message ||
+        "Login failed. Please try again.";
+      toast.error(errorMessage, { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +181,7 @@ const Login = () => {
             {/* Login Button */}
             <Button
               type="submit"
-              className="w-full bg-yellow  hover:bg-yellow-600 text-gray-900 font-bold py-3 rounded-lg transition duration-200 shadow-lg"
+              className="w-full bg-yellow cursor-pointer  hover:bg-yellow-600 text-gray-900 font-bold py-3 rounded-lg transition duration-200 shadow-lg"
               disabled={isLoading}
             >
               {isLoading ? (

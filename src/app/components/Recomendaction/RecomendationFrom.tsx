@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { productSchema } from "../product/productZonValidation";
-import { categories } from "../product/Category";
+import { categories } from "../product/category";
 
 type ProductFormValues = z.infer<typeof productSchema>;
 const RecommendationFrom = () => {

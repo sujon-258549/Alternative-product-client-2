@@ -99,7 +99,7 @@ export const categories = [
   "Sewing",
   "Woodworking",
   "3D Printing",
-];
+] as const;
 
 export const products = [
   {

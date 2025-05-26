@@ -15,6 +15,7 @@ export const registerSchema = z
       postCode: z.string().min(4, "Must be 4+ characters"),
     }),
     dateOfBirth: z.string().min(1, "Required"),
+    profileImage: z.instanceof(File).optional(),
     gender: z.enum(["male", "female", "other"]),
     phone: z
       .string()

@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useMemo, useState } from "react";
-import { products } from "./Category";
+import { products } from "./category";
 
 const AllProduct = () => {
   // State for filters

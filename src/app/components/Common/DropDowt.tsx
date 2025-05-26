@@ -10,13 +10,21 @@ import {
 import { Link } from "react-router";
 import { IoIosNotifications } from "react-icons/io";
 import { Button } from "@/components/ui/button";
+import LogoutButton from "./LogoutButton";
+import { useGetMeQuery } from "@/redux/features/auth/authApi";
+import LoadingSpinner from "./LoadingSpinner";
 const DropDown = () => {
+  const { data: userData, isLoading } = useGetMeQuery(undefined);
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  const user = userData?.data;
   return (
     <div className="flex gap-1">
       <DropdownMenu>
         <DropdownMenuTrigger>
           {" "}
-          <IoIosNotifications className="text-white text-3xl" />
+          <IoIosNotifications className="text-white cursor-pointer text-3xl" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-[#424242] text-white overflow-y-auto max-h-[350px] mt-5 w-[350px]">
           <DropdownMenuSeparator />
@@ -60,7 +68,15 @@ const DropDown = () => {
         <DropdownMenuTrigger>
           {" "}
           <Avatar>
-            <AvatarImage src="https://img.freepik.com/premium-vector/user-circle-outline-gradient-style_78370-7034.jpg?ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740" />
+            <AvatarImage
+              src={
+                user?.profileImage
+                  ? user.profileImage
+                  : "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740"
+              } // Replace with actual path
+              alt="Profile"
+              className="w-16 cursor-pointer h-16 mx-auto rounded-full object-cover bg-blue-500"
+            />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
@@ -68,33 +84,34 @@ const DropDown = () => {
           <DropdownMenuLabel>
             <div className="flex justify-center flex-col">
               <img
-                src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740" // Replace with actual path
+                src={
+                  user?.profileImage
+                    ? user.profileImage
+                    : "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740"
+                } // Replace with actual path
                 alt="Profile"
                 className="w-16 h-16 mx-auto rounded-full object-cover bg-blue-500"
               />
               <h2 className="mt-1 text-white text-xl text-center font-bold">
-                Md Sujon Mia
+                {user?.name || "Name Not Available"}
               </h2>
               <p className="text-gray-400 text-center text-sm mt-1">
-                sujan25854@gmail.com
+                {user?.email || "Email Not Available"}
               </p>
-
-              <Button className="mt-2 px-6 py-3 w-[120px] btn-bg mx-auto btn-bg font-bold rounded-lg hover:scale-105 transition-transform">
-                View Profile
-              </Button>
+              <Link to={"/profile"}>
+                <Button className="mt-2 text-center flex justify-center  px-6 py-3 w-[120px] btn-bg mx-auto btn-bg font-bold rounded-lg hover:scale-105 transition-transform">
+                  View Profile
+                </Button>
+              </Link>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="" />
-          <DropdownMenuItem>
-            {" "}
-            <Link to={"/my-product"}>My Product</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>Billing</DropdownMenuItem>
+          <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>Team</DropdownMenuItem>
           <DropdownMenuItem>Subscription </DropdownMenuItem>
           <DropdownMenuSeparator className="" />
-          <DropdownMenuItem>
-            <Button className="bg-red-500 w-full text-white">Log Out</Button>
+          <DropdownMenuItem className="w-full">
+            <LogoutButton />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

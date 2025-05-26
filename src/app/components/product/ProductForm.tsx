@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "./Category";
+import { categories } from "./category";
 
 type ProductFormValues = z.infer<typeof productSchema>;
 

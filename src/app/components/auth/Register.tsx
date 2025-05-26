@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,7 +14,7 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -22,10 +24,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { registerSchema } from "./schema/register";
 import { RegistrationTerms } from "./RegistrationTerms";
+import { Label } from "@/components/ui/label";
+import { FaFileDownload, FaTimes } from "react-icons/fa";
+import { uploadProfileImage } from "../Common/ImageUpload";
+import { useRegisterUserMutation } from "@/redux/features/auth/authApi";
+import { toast } from "sonner";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfriamPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<{
+    loading: boolean;
+    error?: string;
+    url?: string;
+  }>({ loading: false });
 
   const form = useForm({
     resolver: zodResolver(registerSchema),
@@ -33,6 +46,7 @@ const Register = () => {
       fullName: "",
       email: "",
       password: "",
+      confirmPassword: "",
       role: "user",
       address: {
         village: "",
@@ -44,6 +58,7 @@ const Register = () => {
       dateOfBirth: "",
       gender: "male",
       phone: "",
+      profileImage: undefined,
       secondaryPhone: "",
       socialMesaLink: {
         facebook: "",
@@ -52,22 +67,90 @@ const Register = () => {
         linkedin: "",
       },
       nidNumber: "",
+      acceptTerms: true,
     },
   });
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    console.log(data);
-    // Handle registration
+  const [currentFile, serCurrentFile] = useState<File | undefined>(undefined);
+  const [userRegistered] = useRegisterUserMutation();
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    serCurrentFile(file);
+    if (file) {
+      form.setValue("profileImage", file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
+  const removeImage = () => {
+    form.setValue("profileImage", undefined);
+    setPreviewImage(null);
+  };
+  const navigate = useNavigate();
+
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const toastId = toast.loading("Registering...", { duration: 2000 });
+
+    try {
+      let imageUrl = "";
+      if (currentFile) {
+        imageUrl = await uploadProfileImage(currentFile);
+      }
+
+      const registrationData = {
+        ...data,
+        profileImage: imageUrl || undefined, // Explicit undefined if no image
+      };
+
+      const res = await userRegistered(registrationData).unwrap();
+
+      if (res.success) {
+        toast.success(res.message || "Registration successful!", {
+          id: toastId,
+          duration: 2000,
+        });
+        setTimeout(() => navigate("/login"), 2000); // Redirect after success
+      } else {
+        throw new Error(res.message || "Registration failed");
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+
+      // Handle MongoDB duplicate key error (email already exists)
+      if (error?.code === 11000 || error?.err?.code === 11000) {
+        toast.error("Email already registered. Please use a different email.", {
+          id: toastId,
+          duration: 4000,
+        });
+      }
+      // Handle API error response
+      else if (error?.data?.message) {
+        toast.error(error.data.message, { id: toastId, duration: 4000 });
+      }
+      // Generic fallback
+      else {
+        toast.error(
+          error.message || "Something went wrong. Please try again.",
+          {
+            id: toastId,
+            duration: 4000,
+          }
+        );
+      }
+    }
+  };
   return (
-    <div className="min-h-screen flex items-center justify-center p-4  text-white">
+    <div className="min-h-screen flex items-center justify-center p-4 text-white">
       <Card
         style={{ boxShadow: "1px 1px 20px #fff" }}
         className="w-full max-w-4xl bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700"
       >
         {/* Header with gradient */}
-        <CardHeader className="border-b  p-8 text-white">
+        <CardHeader className="border-b p-8 text-white">
           <div className="flex justify-between items-start">
             <div className="flex gap-2">
               <img src="./logo.png" alt="" className="w-20 object-contain" />
@@ -108,7 +191,7 @@ const Register = () => {
                           <Input
                             placeholder="John Doe"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -127,7 +210,7 @@ const Register = () => {
                             placeholder="email@example.com"
                             {...field}
                             type="email"
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -147,7 +230,7 @@ const Register = () => {
                           <Input
                             {...field}
                             type="date"
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -187,7 +270,7 @@ const Register = () => {
                               placeholder="Enter Your Password"
                               {...field}
                               type={showPassword ? "text" : "password"}
-                              className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700 "
+                              className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                             />
                             <button
                               type="button"
@@ -217,19 +300,19 @@ const Register = () => {
                         <FormControl>
                           <div className="relative">
                             <Input
-                              placeholder="Enter Your Password"
+                              placeholder="Confirm Your Password"
                               {...field}
-                              type={showConfriamPassword ? "text" : "password"}
-                              className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                              type={showConfirmPassword ? "text" : "password"}
+                              className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                             />
                             <button
                               type="button"
                               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                               onClick={() =>
-                                setShowConfirmPassword(!showConfriamPassword)
+                                setShowConfirmPassword(!showConfirmPassword)
                               }
                             >
-                              {showPassword ? (
+                              {showConfirmPassword ? (
                                 <EyeOffIcon className="h-5 w-5" />
                               ) : (
                                 <EyeIcon className="h-5 w-5" />
@@ -263,7 +346,7 @@ const Register = () => {
                           <Input
                             placeholder="Enter village"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -281,7 +364,7 @@ const Register = () => {
                           <Input
                             placeholder="Enter district"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -301,7 +384,7 @@ const Register = () => {
                           <Input
                             placeholder="Enter sub-district"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -319,7 +402,7 @@ const Register = () => {
                           <Input
                             placeholder="Enter post"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -337,7 +420,7 @@ const Register = () => {
                           <Input
                             placeholder="Enter post code"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -368,7 +451,7 @@ const Register = () => {
                           <Input
                             placeholder="01XXXXXXXXX"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -388,7 +471,7 @@ const Register = () => {
                           <Input
                             placeholder="01XXXXXXXXX"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -408,7 +491,7 @@ const Register = () => {
                           <Input
                             placeholder="Enter NID number"
                             {...field}
-                            className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                           />
                         </FormControl>
                         <FormMessage className="text-xs text-red-500" />
@@ -419,9 +502,7 @@ const Register = () => {
 
                 {/* Social Media Section */}
                 <div className="space-y-4">
-                  <h4 className="font-medium ">
-                    Social Media Links (Optional)
-                  </h4>
+                  <h4 className="font-medium">Social Media Links (Optional)</h4>
                   <div className="grid md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
@@ -436,7 +517,7 @@ const Register = () => {
                             <Input
                               placeholder="https://facebook.com/username"
                               {...field}
-                              className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                              className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                             />
                           </FormControl>
                           <FormMessage className="text-xs text-red-500" />
@@ -457,7 +538,7 @@ const Register = () => {
                             <Input
                               placeholder="https://instagram.com/username"
                               {...field}
-                              className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                              className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                             />
                           </FormControl>
                           <FormMessage className="text-xs text-red-500" />
@@ -471,14 +552,14 @@ const Register = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center">
-                            <TwitterIcon className="w-5 h-5 mr-2 " />
+                            <TwitterIcon className="w-5 h-5 mr-2" />
                             Twitter
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="https://twitter.com/username"
                               {...field}
-                              className="border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
+                              className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                             />
                           </FormControl>
                           <FormMessage className="text-xs text-red-500" />
@@ -492,14 +573,14 @@ const Register = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="flex items-center">
-                            <LinkedinIcon className="w-5 h-5 mr-2 text-ywllo-700" />
+                            <LinkedinIcon className="w-5 h-5 mr-2 text-blue-700" />
                             LinkedIn
                           </FormLabel>
                           <FormControl>
                             <Input
                               placeholder="https://linkedin.com/in/username"
                               {...field}
-                              className="border-gray-300  focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 pr-10 bg-gray-700"
+                              className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-10 bg-gray-700"
                             />
                           </FormControl>
                           <FormMessage className="text-xs text-red-500" />
@@ -508,7 +589,66 @@ const Register = () => {
                     />
                   </div>
                 </div>
-
+                {/* Profile Photo */}
+                <FormField
+                  control={form.control}
+                  name="profileImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">
+                        Profile Photo
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            id="profileImage"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageChange}
+                            ref={field.ref}
+                            onBlur={field.onBlur}
+                          />
+                          <Label
+                            htmlFor="profileImage"
+                            className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-600 bg-gray-700 hover:bg-gray-600 transition-colors"
+                          >
+                            {previewImage ? (
+                              <div className="relative h-full w-full">
+                                <img
+                                  src={previewImage}
+                                  alt="Preview"
+                                  className="h-full w-full object-contain p-2"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeImage();
+                                  }}
+                                  className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                                >
+                                  <FaTimes size={14} />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center justify-center p-4 text-center">
+                                <FaFileDownload className="mb-3 text-4xl text-gray-400" />
+                                <span className="text-gray-300 font-medium">
+                                  Click to upload or drag and drop
+                                </span>
+                                <span className="text-sm text-gray-400 mt-1">
+                                  PNG, JPG, JPEG (max. 5MB)
+                                </span>
+                              </div>
+                            )}
+                          </Label>
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
                 {/* Terms and Submit */}
                 <div className="space-y-6 pt-4">
                   <FormField
@@ -520,18 +660,22 @@ const Register = () => {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
-                            className=" border-yellow-300 mt-1 data-[state=checked]:bg-yellow-600 data-[state=checked]:border-yellow-600"
+                            className="border-yellow-300 mt-1 data-[state=checked]:bg-yellow-600 data-[state=checked]:border-yellow-600"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel className="font-normal">
                             I agree to the{" "}
-                            <a
-                              href="#"
-                              className="text-yellow  hover:underline font-medium"
+                            <button
+                              type="button"
+                              className="text-yellow cursor-pointer hover:underline font-medium"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                // Open terms modal here
+                              }}
                             >
                               <RegistrationTerms />
-                            </a>
+                            </button>
                           </FormLabel>
                         </div>
                         <FormMessage className="text-xs text-red-500" />
@@ -541,19 +685,25 @@ const Register = () => {
 
                   <Button
                     type="submit"
-                    className="w-full text-black bg-yellow"
+                    className="w-full text-black bg-yellow cursor-pointer hover:bg-yellow-600"
                     size="lg"
+                    disabled={uploadStatus.loading}
                   >
-                    Create Account
+                    {uploadStatus.loading
+                      ? "Creating Account..."
+                      : "Create Account"}
                   </Button>
+                  {uploadStatus.error && (
+                    <p className="text-red-500 text-sm">{uploadStatus.error}</p>
+                  )}
                 </div>
               </div>
             </form>
           </Form>
         </CardContent>
 
-        <CardFooter className="p-6 border-t ">
-          <p className="text-center text-sm  w-full">
+        <CardFooter className="p-6 border-t">
+          <p className="text-center text-sm w-full">
             Already have an account?{" "}
             <Link
               to="/login"
@@ -568,7 +718,7 @@ const Register = () => {
   );
 };
 
-// Icon components (keep the same as in your original code)
+// Icon components
 const EyeIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
