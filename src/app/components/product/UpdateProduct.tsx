@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { productSchema } from "./productZonValidation";
 import { Label } from "@/components/ui/label";
@@ -28,36 +28,71 @@ import {
 import { categories } from "./category";
 import { uploadProfileImage } from "../Common/ImageUpload";
 import { toast } from "sonner";
-import { useCreateProductMutation } from "@/redux/features/product/product";
-import { useNavigate } from "react-router";
+import {
+  useFindOneProductQuery,
+  useUpdateProductMutation,
+} from "@/redux/features/product/product";
+import { useNavigate, useParams } from "react-router";
+import { TProduct } from "@/types/product";
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-const ProductForm = () => {
+const UpdateProduct = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const { _id } = useParams();
+  const {
+    data: products,
+    isError,
+    isLoading: isProductLoading,
+  } = useFindOneProductQuery(_id);
+  const product = products?.data as TProduct;
+  const navigate = useNavigate();
+  const [updateProduct] = useUpdateProductMutation();
+  const [currentFile, setCurrentFile] = useState<File | undefined>(undefined);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      productName: "",
-      brandName: "",
-      price: 0,
-      originalPrice: 0,
-      currency: "BDT",
-      description: "",
-      shortDescription: "",
-      isInStock: true,
-      categories: "",
-      weight: 0,
-      isDigital: "no",
-      productUrl: undefined,
-    },
   });
-  const [currentFile, serCurrentFile] = useState<File | undefined>(undefined);
+
+  // Set form values when product data is loaded
+  useEffect(() => {
+    if (product) {
+      form.reset({
+        productName: product?.productName,
+        brandName: product?.brandName,
+        price: product?.price,
+        originalPrice: product?.originalPrice,
+        currency: product?.currency,
+        description: product?.description,
+        shortDescription: product?.shortDescription,
+        isInStock: product?.isInStock,
+        categories: product?.categories,
+        weight: product?.weight,
+        isDigital: product?.isDigital,
+      });
+      if (product.productUrl) {
+        setPreviewImage(product.productUrl);
+      }
+    }
+  }, [product, form]);
+
+  if (isError)
+    return (
+      <div className="text-center py-20 text-red-500 animate-pulse">
+        Error loading product
+      </div>
+    );
+
+  if (isProductLoading)
+    return <div className="text-center py-20">Loading product...</div>;
+
+  if (!product)
+    return <div className="text-center py-20">Product not found</div>;
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    serCurrentFile(file);
+    setCurrentFile(file);
     if (file) {
       form.setValue("productUrl", file);
       const reader = new FileReader();
@@ -71,51 +106,50 @@ const ProductForm = () => {
   const removeImage = () => {
     form.setValue("productUrl", undefined);
     setPreviewImage(null);
+    setCurrentFile(undefined);
   };
 
-  const [createProduct] = useCreateProductMutation();
-  const navigate = useNavigate();
-  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<ProductFormValues> = async (productInfo) => {
     setIsLoading(true);
-    const toastId = toast.loading("Creating Product...", { duration: 2000 });
+    const toastId = toast.loading("Updating Product...", { duration: 2000 });
     try {
-      console.log("Product data:", data);
-      let imageUrl = "";
+      let imageUrl = product.productUrl;
       if (currentFile) {
         imageUrl = await uploadProfileImage(currentFile);
       }
 
-      const productData = {
-        ...data,
+      const data = {
+        ...productInfo,
         productUrl: imageUrl || undefined,
       };
-      const res = await createProduct(productData).unwrap();
+
+      const productData = {
+        id: _id,
+        data,
+      };
+      console.log(productData);
+      const res = await updateProduct(productData).unwrap();
 
       if (res.success) {
-        toast.success(res.message || "Product Creating successful!", {
+        toast.success(res.message || "Product updated successfully!", {
           id: toastId,
           duration: 2000,
         });
-        setTimeout(() => navigate("/My-product"), 2000); // Redirect after success
+        setTimeout(() => navigate("/My-product"), 2000);
       } else {
-        throw new Error(res.message || "Product Creating failed");
+        throw new Error(res.message || "Product update failed");
       }
     } catch (error: any) {
-      console.error("Registration error:", error);
+      console.error("Update error:", error);
 
-      // Handle MongoDB duplicate key error (email already exists)
       if (error?.code === 11000 || error?.err?.code === 11000) {
-        toast.error("Email already registered. Please use a different email.", {
+        toast.error("Product update conflict. Please try again.", {
           id: toastId,
           duration: 3000,
         });
-      }
-      // Handle API error response
-      else if (error?.data?.message) {
+      } else if (error?.data?.message) {
         toast.error(error.data.message, { id: toastId, duration: 4000 });
-      }
-      // Generic fallback
-      else {
+      } else {
         toast.error(
           error.message || "Something went wrong. Please try again.",
           {
@@ -124,6 +158,8 @@ const ProductForm = () => {
           }
         );
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -131,11 +167,9 @@ const ProductForm = () => {
     <div className="min-h-screen py-10 flex justify-center items-center bg-gray-900">
       <div className="max-w-4xl w-full mx-4 bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-yellow-400">
-            Add New Product
-          </h2>
+          <h2 className="text-3xl font-bold text-yellow-400">Update Product</h2>
           <p className="text-gray-300 mt-2">
-            Fill in the details below to add a new product to your inventory
+            Update the details of your product
           </p>
         </div>
 
@@ -467,7 +501,7 @@ const ProductForm = () => {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full bg-yellow-600 cursor-pointer hover:bg-yellow-700 text-white font-bold py-3 rounded-lg transition-colors"
+              className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 rounded-lg transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -492,10 +526,10 @@ const ProductForm = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Adding Product...
+                  Updating Product...
                 </span>
               ) : (
-                "Add Product"
+                "Update Product"
               )}
             </Button>
           </form>
@@ -505,4 +539,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm;
+export default UpdateProduct;

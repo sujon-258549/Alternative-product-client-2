@@ -1,13 +1,10 @@
 import { useState } from "react";
-import {
-  useDeleteMyProductMutation,
-  useGetMyProductQuery,
-} from "@/redux/features/product/product";
+import { useDeleteMyProductMutation } from "@/redux/features/product/product";
 import LoadingSpinner from "../Common/LoadingSpinner";
 import ResponsivePagination from "react-responsive-pagination";
 import { FiExternalLink } from "react-icons/fi";
 import Swal from "sweetalert2";
-import "./pagination.css";
+import ".././product/pagination.css";
 import {
   Table,
   TableBody,
@@ -27,14 +24,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "./category";
 import { Link } from "react-router";
+import { categories } from "../product/category";
+import { useGetMyRecommendedQuery } from "@/redux/features/recommended/recommended";
 
-const MyProduct = () => {
+const MyRecommended = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [stockFilter, setStockFilter] = useState<string>("all");
-  const [digitalFilter, setDigitalFilter] = useState<string>("all");
+  const [digitalFilter, setDigitalFilter] = useState<string>();
   const [page, setCurrentPage] = useState<string>("1");
   const limit = "5";
 
@@ -124,15 +121,9 @@ const MyProduct = () => {
   };
 
   const queryParams = [{ name: "searchTerm", value: searchQuery }];
+  console.log(queryParams);
   if (selectedCategory !== "" && selectedCategory !== "All-Category") {
     queryParams.push({ name: "categories", value: selectedCategory });
-  }
-  if (stockFilter !== "all") {
-    queryParams.push({
-      name: "isInStock",
-      // @ts-expect-error values
-      value: stockFilter === "inStock" ? true : false,
-    });
   }
   if (page) {
     queryParams.push({
@@ -146,15 +137,15 @@ const MyProduct = () => {
       value: limit.toString(),
     });
   }
-  if (digitalFilter !== "all") {
+  if (digitalFilter !== "all" && digitalFilter !== undefined) {
     queryParams.push({
       name: "isDigital",
-      // @ts-expect-error values
+      // @ts-expect-error string
       value: digitalFilter === "digital" ? true : false,
     });
   }
-
-  const { data: myProducts, isLoading } = useGetMyProductQuery(queryParams);
+  console.log(digitalFilter);
+  const { data: myProducts, isLoading } = useGetMyRecommendedQuery(queryParams);
   console.log(myProducts);
   const products = myProducts?.data || [];
   const totalPage = myProducts?.meta.totalPage;
@@ -173,50 +164,49 @@ const MyProduct = () => {
 
         {/* Search and Filters */}
         <div className="mb-6 space-y-4">
-          <form
-            onSubmit={handleSearchSubmit}
-            className="max-w-md mx-auto mb-5 md:mb-10 lg:mb-16"
-          >
-            <Label htmlFor="product-search" className="sr-only">
-              Search products
-            </Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-500"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
-              </div>
-              <input
-                name="search"
-                type="search"
-                id="product-search"
-                className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Search products..."
-                defaultValue={searchQuery}
-              />
-              <button
-                type="submit"
-                className="text-white absolute end-2.5 bottom-2.5 btn-bg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
-              >
-                Search
-              </button>
-            </div>
-          </form>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1  md:max-w-xl lg:max-w-7xl mx-auto lg:grid-cols-3 items-center gap-4">
             {/* Category Filter */}
+            <div>
+              <h2 className="text-xl font-bold mb-2">Search Fields</h2>
+              <form onSubmit={handleSearchSubmit} className="w-full">
+                <Label htmlFor="product-search" className="sr-only">
+                  Search products
+                </Label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <svg
+                      className="w-4 h-4 text-gray-500"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    name="search"
+                    type="search"
+                    id="product-search"
+                    className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Search products..."
+                    defaultValue={searchQuery}
+                  />
+                  <button
+                    type="submit"
+                    className="text-white absolute end-2.5 bottom-2.5 btn-bg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+                  >
+                    Search
+                  </button>
+                </div>
+              </form>
+            </div>
             <div>
               <Label
                 htmlFor="category-filter"
@@ -228,10 +218,13 @@ const MyProduct = () => {
                 value={selectedCategory}
                 onValueChange={setSelectedCategory}
               >
-                <SelectTrigger className="w-full " id="category-filter">
+                <SelectTrigger
+                  className="w-full py-[25px] border-2"
+                  id="category-filter"
+                >
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
-                <SelectContent className="bg-white">
+                <SelectContent className="bg-white ">
                   {categories.map((category) => (
                     <SelectItem
                       className="bg-[#424242] mt-1 text-white hover:bg-[#424242d2] hover:text-white"
@@ -245,38 +238,6 @@ const MyProduct = () => {
               </Select>
             </div>
 
-            {/* Stock Status Filter */}
-            <div className="">
-              <Label htmlFor="stock-filter" className="text-xl font-bold mb-2">
-                Stock Status
-              </Label>
-              <Select onValueChange={(value) => setStockFilter(value)}>
-                <SelectTrigger id="stock-filter" className="w-full">
-                  <SelectValue placeholder="Select stock status" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  <SelectItem
-                    className="bg-[#424242] mt-1 text-white hover:bg-[#424242d2] hover:text-white"
-                    value="all"
-                  >
-                    All
-                  </SelectItem>
-                  <SelectItem
-                    className="bg-[#424242] mt-1 text-white hover:bg-[#424242d2] hover:text-white"
-                    value="inStock"
-                  >
-                    In Stock
-                  </SelectItem>
-                  <SelectItem
-                    className="bg-[#424242] mt-1 text-white hover:bg-[#424242d2] hover:text-white"
-                    value="outOfStock"
-                  >
-                    Out of Stock
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Digital/Physical Filter */}
             <div>
               <Label
@@ -286,7 +247,10 @@ const MyProduct = () => {
                 Product Type
               </Label>
               <Select onValueChange={(value) => setDigitalFilter(value)}>
-                <SelectTrigger id="digital-filter" className="w-full">
+                <SelectTrigger
+                  id="digital-filter"
+                  className="w-full py-[25px] border-2"
+                >
                   <SelectValue placeholder="Select product type" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
@@ -323,7 +287,7 @@ const MyProduct = () => {
               <TableHead>Brand</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Stock</TableHead>
+              <TableHead>Digital</TableHead>
               <TableHead>Type</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -335,8 +299,8 @@ const MyProduct = () => {
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
                       <img
-                        src={product.productUrl}
-                        alt={product.productName}
+                        src={product?.recommendationImage}
+                        alt={product?.productName}
                         className="w-10 h-10 rounded-md object-cover"
                       />
                       <div>
@@ -364,23 +328,23 @@ const MyProduct = () => {
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        product.isInStock
+                        product.isDigital
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {product.isInStock ? "In Stock" : "Out of Stock"}
+                      {product.isDigital ? "Digital" : "Analog"}
                     </span>
                   </TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        product.isDigital === true
+                        product.isDigital === "true"
                           ? "bg-purple-100 text-purple-800"
                           : "bg-blue-100 text-blue-800"
                       }`}
                     >
-                      {product.isDigital === true ? "Digital" : "Analog"}
+                      {product.isDigital === "true" ? "Digital" : "Physical"}
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
@@ -395,13 +359,13 @@ const MyProduct = () => {
                           Edit
                         </Button>
                       </Link>
-                      <Link to={`/my-product-details/${product._id}`}>
+                      <Link to={`/my-recommended-Details/${product._id}`}>
                         <Button
                           variant="outline"
                           size="sm"
                           className="cursor-pointer"
                         >
-                          <FiExternalLink className="h-4 cursor-pointer w-4 mr-2" />
+                          <FiExternalLink className="h-4  w-4 mr-2" />
                           Details
                         </Button>
                       </Link>
@@ -410,7 +374,7 @@ const MyProduct = () => {
                         className="bg-red-700 cursor-pointer"
                         size="sm"
                       >
-                        <LucideDelete className="h-4 w-4 mr-2 " />
+                        <LucideDelete className="h-4 w-4 mr-2 cursor-pointer" />
                         Delete
                       </Button>
                     </div>
@@ -438,4 +402,4 @@ const MyProduct = () => {
   );
 };
 
-export default MyProduct;
+export default MyRecommended;

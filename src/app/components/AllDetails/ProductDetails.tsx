@@ -1,96 +1,25 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { useFindOneProductQuery } from "@/redux/features/product/product";
+import { Link, useParams } from "react-router";
 
 const ProductDetails = () => {
-  // Main product data
-  const product = {
-    productName: "Wireless Bluetooth Headphones",
-    brandName: "SoundMax",
-    price: 49.99,
-    originalPrice: 69.99,
-    currency: "USD",
-    description:
-      "High-fidelity wireless headphones Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore reprehenderit magnam iure enim, perspiciatis veniam ut minima repellendus, accusantium odio officia optio tempora possimus ex voluptas dignissimos expedita laudantium quae! with active noise cancellation, long battery life, and Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore reprehenderit magnam iure enim, perspiciatis veniam ut minima repellendus, accusantium odio officia optio tempora possimus ex voluptas dignissimos expedita laudantium quae! comfortable ear cups. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore reprehenderit magnam iure enim, perspiciatis veniam ut minima repellendus, accusantium odio officia optio tempora possimus ex voluptas dignissimos expedita laudantium quae! lorem",
-    shortDescription: "Noise-cancelling wireless headphones ",
-    productUrl:
-      "https://img.freepik.com/free-photo/black-headphones-digital-device_53876-96805.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740",
-    isInStock: true,
-    categories: "Electronics",
-    weight: 350,
-    isDigital: false,
-    createdAt: "2025-05-21T06:51:38.177+00:00",
-    updatedAt: "2025-05-21T06:51:38.177+00:00",
-  };
+  const { _id } = useParams();
+  const { data: products, isLoading } = useFindOneProductQuery(_id);
+  const product = products?.data;
 
-  // Recommendations using same data structure
+  // Recommendations data
   const recommendations = [
     {
+      id: 1,
       productName: "Sports Wireless Earbuds",
       brandName: "SoundMax",
       price: 39.99,
       originalPrice: 59.99,
       productUrl:
-        "https://img.freepik.com/free-photo/black-headphones-digital-device_53876-96805.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740",
+        "https://img.freepik.com/free-photo/black-headphones-digital-device_53876-96805.jpg",
     },
-    {
-      productName: "Over-Ear Studio Headphones",
-      brandName: "AudioPro",
-      price: 149.99,
-      originalPrice: 199.99,
-      productUrl:
-        "https://img.freepik.com/free-photo/black-headphones-digital-device_53876-96805.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740",
-    },
-    {
-      productName: "Wireless Neckband Headphones",
-      brandName: "SoundMax",
-      price: 29.99,
-      originalPrice: 49.99,
-      productUrl:
-        "https://img.freepik.com/free-photo/black-headphones-digital-device_53876-96805.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740",
-    },
-    {
-      productName: "Noise Cancelling Earbuds",
-      brandName: "AudioPro",
-      price: 79.99,
-      originalPrice: 99.99,
-      productUrl:
-        "https://img.freepik.com/free-photo/black-headphones-digital-device_53876-96805.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740",
-    },
-    {
-      productName: "Noise Cancelling Earbuds",
-      brandName: "AudioPro",
-      price: 79.99,
-      originalPrice: 99.99,
-      productUrl:
-        "https://img.freepik.com/free-photo/black-headphones-digital-device_53876-96805.jpg?uid=R190067195&ga=GA1.1.547461502.1745654198&semt=ais_hybrid&w=740",
-    },
+    // ... other recommendation items
   ];
-
-  // Currency formatter
-  // interface Product {
-  //     productName: string;
-  //     brandName: string;
-  //     price: number;
-  //     originalPrice: number;
-  //     currency?: string;
-  //     description?: string;
-  //     shortDescription?: string;
-  //     productUrl: string;
-  //     isInStock?: boolean;
-  //     categories?: string;
-  //     weight?: number;
-  //     isDigital?: boolean;
-  //     createdAt?: string;
-  //     updatedAt?: string;
-  // }
-
-  // interface Recommendation {
-  //     productName: string;
-  //     brandName: string;
-  //     price: number;
-  //     originalPrice: number;
-  //     productUrl: string;
-  // }
 
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat("en-US", {
@@ -99,97 +28,145 @@ const ProductDetails = () => {
     }).format(price);
   };
 
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+
   return (
-    <section className="container">
-      <div className=" py-10">
-        {/* Main Product Section */}
-        <div className="grid items-center grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Product Image */}
-          <div className="bg-gray-200 rounded-xl p-4 ">
-            <img
-              src={product.productUrl}
-              alt={product.productName}
-              className="w-full h-auto object-contain rounded-md"
-            />
+    <section className="container mx-auto px-4 ">
+      {/* Main Product Section */}
+      <div className="grid py-10 items-center grid-cols-1 lg:grid-cols-2 gap-8 mb-12 animate-fadeIn">
+        {/* Product Image */}
+        <div className="bg-card rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+          <img
+            src={product?.productUrl}
+            alt={product?.productName}
+            className="w-full h-auto max-h-[500px] object-contain rounded-md transition-transform duration-500 hover:scale-105"
+          />
+        </div>
+
+        {/* Product Details */}
+        <div className="space-y-6">
+          <h1 className="text-3xl text-yellow-600 font-bold text-foreground">
+            {product?.productName}
+          </h1>
+          <div className="text-lg text-amber-500 text-muted-foreground">
+            {product?.brandName}
           </div>
 
-          {/* Product Details */}
-          <div className="space-y-4">
-            <h1 className="text-3xl text-white  font-bold">
-              {product.productName}
-            </h1>
-            <div className="text-lg text-gray-300">{product.brandName}</div>
+          <div className="flex items-center gap-4">
+            <span className="text-2xl text-white font-bold text-primary">
+              {formatPrice(product?.price)}
+            </span>
+            {product?.originalPrice > product?.price && (
+              <span className="text-muted-foreground text-gray-400 line-through">
+                {formatPrice(product?.originalPrice)}
+              </span>
+            )}
+          </div>
 
-            <div className="flex items-center gap-4">
-              <span className="text-2xl font-bold text-yellow-600">
-                {formatPrice(product.price)}
-              </span>
-              <span className="text-gray-400 line-through">
-                {formatPrice(product.originalPrice)}
-              </span>
+          <div className="space-y-6">
+            <div
+              className={`inline-block px-4 py-2 rounded-lg font-bold ${
+                product?.isInStock
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              {product?.isInStock ? "In Stock" : "Out of Stock"}
             </div>
 
-            <div className="space-y-4">
-              <div className="bg-yellow-300 font-bold text-green-800 px-4 py-2 rounded-lg inline-block">
-                {product.isInStock ? "In Stock" : "Out of Stock"}
-              </div>
-              <p className="text-gray-400">{product.description}</p>
+            <p className="text-muted-foreground text-gray-400">
+              {product?.description}
+            </p>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-sm text-gray-500">Category</h3>
-                  <p className="font-medium">{product.categories}</p>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-sm text-gray-500">Weight</h3>
-                  <p className="font-medium">{product.weight}g</p>
-                </div>
+            <div className="grid grid-cols-2 gap-6 animate-fadeIn delay-500">
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">
+                  Category
+                </h3>
+                <p className="font-semibold text-indigo-600">
+                  {product.categories}
+                </p>
               </div>
-              <Link to={"/add-recommendation"}>
-                <Button className="mt-2  w-full    text-black text-sm py-6 font-bold rounded-lg btn-bg transition-all">
-                  Add Recommended
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">
+                  Weight
+                </h3>
+                <p className="font-semibold text-indigo-600">
+                  {product.weight}g
+                </p>
+              </div>
+            </div>
+
+            <Link to={`/add-recommendation/${product._id}`}>
+              <Button className="w-full py-6 cursor-pointer btn-bg font-bold transition-all hover:scale-[1.02]">
+                Add Recommended
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Recommendations Section */}
+      <h2 className="text-2xl font-bold mb-6 text-yellow text-center text-foreground">
+        Recommended Products
+      </h2>
+      <div className="border-b border-yellow-400 max-w-2xl mx-auto px-5"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 my-10 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        {recommendations.map((item) => (
+          <div
+            key={item.id}
+            className="bg-[#424242] text-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+          >
+            <div className="p-4">
+              <img
+                src={item.productUrl}
+                alt={item.productName}
+                className="w-full h-48 object-cover rounded-md mb-4 transition-transform duration-300 hover:scale-105"
+              />
+              <h3 className="font-semibold text-foreground mb-1 line-clamp-1">
+                {item.productName}
+              </h3>
+              <p className="text-muted-foreground text-sm mb-2">
+                {item.brandName}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-primary">
+                  {formatPrice(item.price)}
+                </span>
+                {item.originalPrice > item.price && (
+                  <span className="text-muted-foreground line-through text-sm">
+                    {formatPrice(item.originalPrice)}
+                  </span>
+                )}
+              </div>
+              <Link to={`/recommendation-details/${item.id}`}>
+                <Button
+                  variant="outline"
+                  className="mt-4 w-full transition-colors"
+                >
+                  View Details
                 </Button>
               </Link>
             </div>
           </div>
-        </div>
-
-        {/* Recommendations */}
-        <h2 className="text-2xl font-bold mb-6">Recommended Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {recommendations.map((item, index) => (
-            <div
-              key={index}
-              className="bg-[#424242] rounded-md shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="p-2">
-                <img
-                  src={item.productUrl}
-                  alt={item.productName}
-                  className="w-full h-48 rounded-sm mb-4"
-                />
-                <h3 className="font-semibold text-gray-300 mb-1">
-                  {item.productName.slice(0, 15)}
-                </h3>
-                <p className="text-gray-400 text-sm mb-2 ">{item.brandName}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-blue-600">
-                    {formatPrice(item.price)}
-                  </span>
-                  <span className="text-gray-400 line-through text-sm">
-                    {formatPrice(item.originalPrice)}
-                  </span>
-                </div>
-                <Link to={"/recommendation-Details-page"}>
-                  <button className="mt-4 w-full btn-bg text-gray-900 py-2 rounded-lg transition-colors">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
+
+      {/* Add these to your global CSS */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+      `}</style>
     </section>
   );
 };

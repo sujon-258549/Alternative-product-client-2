@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
@@ -23,16 +22,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { productSchema } from "../product/productZonValidation";
 import { categories } from "../product/category";
+import { uploadProfileImage } from "../Common/ImageUpload";
+import { useNavigate, useParams } from "react-router";
+import { recommendedSchema } from "./recommended";
+import { toast } from "sonner";
+import { useCreateRecommendedMutation } from "@/redux/features/recommended/recommended";
 
-type ProductFormValues = z.infer<typeof productSchema>;
+type ProductFormValues = z.infer<typeof recommendedSchema>;
 const RecommendationFrom = () => {
+  const { _id } = useParams();
+  console.log(_id);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(recommendedSchema),
     defaultValues: {
       productName: "",
       brandName: "",
@@ -41,7 +46,6 @@ const RecommendationFrom = () => {
       currency: "BDT",
       description: "",
       shortDescription: "",
-      isInStock: true,
       categories: "",
       weight: 0,
       isDigital: "no",
@@ -49,8 +53,10 @@ const RecommendationFrom = () => {
     },
   });
 
+  const [currentFile, setProfileImage] = useState<File | undefined>(undefined);
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setProfileImage(file);
     if (file) {
       form.setValue("productUrl", file);
       const reader = new FileReader();
@@ -65,14 +71,44 @@ const RecommendationFrom = () => {
     form.setValue("productUrl", undefined);
     setPreviewImage(null);
   };
-
-  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
+  const [createRecommended] = useCreateRecommendedMutation();
+  const navigate = useNavigate();
+  const onSubmit: SubmitHandler<ProductFormValues> = async (
+    recommendedData
+  ) => {
     setIsLoading(true);
+    const toastId = toast.loading("Creating Recommended...", {
+      duration: 2000,
+    });
+    let imageUrl = "";
+    if (currentFile) {
+      imageUrl = await uploadProfileImage(currentFile);
+    }
     try {
-      console.log("Product data:", data);
-      // Add your product submission logic here
+      const recommendData = {
+        ...recommendedData,
+        isDigital: recommendedData.isDigital === "no" ? false : true,
+        recommendationImage: imageUrl,
+      };
+      const inputData = {
+        data: recommendData,
+        id: _id,
+      };
+      console.log(inputData);
+
+      const res = await createRecommended(inputData).unwrap();
+
+      if (res.success) {
+        toast.success(res.message || "Recommended Creating successful!", {
+          id: toastId,
+          duration: 2000,
+        });
+        setTimeout(() => navigate("/my-recommended"), 2000); // Redirect after success
+      } else {
+        throw new Error(res.message || "Recommended Creating failed");
+      }
     } catch (error) {
-      console.error("Product creation failed:", error);
+      console.error("Recommended creation failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -100,11 +136,11 @@ const RecommendationFrom = () => {
                 render={({ field }) => (
                   <FormItem className="sm:col-span-2">
                     <FormLabel className="text-gray-300">
-                      Product Name
+                      Recommend Product Name
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter product name"
+                        placeholder="Enter Recommend product name"
                         {...field}
                         className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                         disabled={isLoading}
@@ -121,10 +157,12 @@ const RecommendationFrom = () => {
                 name="brandName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Brand Name</FormLabel>
+                    <FormLabel className="text-gray-300">
+                      Recommend Brand Name
+                    </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter brand name"
+                        placeholder="Enter Recommend brand name"
                         {...field}
                         className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                         disabled={isLoading}
@@ -141,14 +179,16 @@ const RecommendationFrom = () => {
                 name="categories"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Category</FormLabel>
+                    <FormLabel className="text-gray-300">
+                      Recommend Category
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl className="w-full">
                         <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder="Select Recommend category" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-gray-800 border-gray-700 text-white max-h-96 overflow-y-auto">
@@ -170,11 +210,13 @@ const RecommendationFrom = () => {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Price</FormLabel>
+                    <FormLabel className="text-gray-300">
+                      Recommend Product Price
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="Enter price"
+                        placeholder="Enter Recommend product price"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                         className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
@@ -193,12 +235,12 @@ const RecommendationFrom = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-gray-300">
-                      Original Price
+                      Recommend Original Price
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="Enter original price"
+                        placeholder="Enter Recommend original price"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                         className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
@@ -216,14 +258,16 @@ const RecommendationFrom = () => {
                 name="currency"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Currency</FormLabel>
+                    <FormLabel className="text-gray-300">
+                      Recommend Currency
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl className="w-full">
                         <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-                          <SelectValue placeholder="Select currency" />
+                          <SelectValue placeholder="Select Recommend currency" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-gray-800 border-gray-700 text-white">
@@ -245,7 +289,10 @@ const RecommendationFrom = () => {
                 name="weight"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-300">Weight (kg)</FormLabel>
+                    <FormLabel className="text-gray-300">
+                      {" "}
+                      Weight (kg)
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -285,28 +332,6 @@ const RecommendationFrom = () => {
                       </SelectContent>
                     </Select>
                     <FormMessage className="text-red-400" />
-                  </FormItem>
-                )}
-              />
-
-              {/* Is In Stock */}
-              <FormField
-                control={form.control}
-                name="isInStock"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-700 p-4 sm:col-span-2">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="border-gray-500 data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="text-gray-300">
-                        Product is in stock
-                      </FormLabel>
-                    </div>
                   </FormItem>
                 )}
               />
@@ -420,7 +445,7 @@ const RecommendationFrom = () => {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full btn-bg text-white font-bold py-3 rounded-lg transition-colors"
+              className="w-full btn-bg text-white font-bold cursor-pointer py-3 rounded-lg transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (

@@ -1,4 +1,7 @@
 export const categories = [
+  "All-Category",
+  "Electronics",
+  "Wearables",
   "Technology",
   "Science",
   "Health",

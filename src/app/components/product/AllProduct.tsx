@@ -1,44 +1,80 @@
+import { useEffect, useState } from "react";
+import { useGetAllProductQuery } from "@/redux/features/product/product";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { useMemo, useState } from "react";
-import { products } from "./category";
+import LoadingSpinner from "../Common/LoadingSpinner";
+import { categories } from "./category";
+import "./allProduct.css";
+import ResponsivePagination from "react-responsive-pagination";
+import { Link } from "react-router";
+interface Product {
+  _id: string;
+  productName: string;
+  brandName: string;
+  price: number;
+  originalPrice?: number;
+  productUrl: string;
+  shortDescription: string;
+  categories: string;
+  isInStock: boolean;
+  isDigital: boolean;
+}
+
+interface QueryParam {
+  name: string;
+  value: string | number | boolean;
+}
+
+const PRICE_RANGE_MIN = 0;
+const PRICE_RANGE_MAX = 50000;
 
 const AllProduct = () => {
   // State for filters
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [inStockOnly, setInStockOnly] = useState(true);
-  const [digital, setDigital] = useState(true);
+  const [selectedCategoriesData, setSelectedCategoriesData] = useState<
+    QueryParam[]
+  >([]);
+  const [inStockOnly, setInStockOnly] = useState<boolean>(false);
+  const [digitalOnly, setDigitalOnly] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [minPrice, maxPrice] = priceRange;
+  const [page, setCurrentPage] = useState<string>("1");
+  const limit = "8";
+  console.log(minPrice, maxPrice);
 
-  // Extract unique categories
-  const categories = useMemo(() => {
-    return Array.from(new Set(products.map((product) => product.categories)));
-  }, []);
+  // Prepare query parameters
+  const queryParams: QueryParam[] = [
+    // { name: "minPrice", value: minPrice },
+    // { name: "maxPrice", value: maxPrice },
+    { name: "searchTerm", value: searchQuery },
+    { name: "page", value: page },
+    { name: "limit", value: limit },
+    ...(digitalOnly ? [{ name: "isDigital", value: true }] : []),
+    ...(inStockOnly ? [{ name: "isInStock", value: true }] : []),
+    ...selectedCategoriesData,
+  ];
 
-  // Filter products based on selected filters
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      // Price filter
-      const withinPriceRange =
-        product.price >= priceRange[0] && product.price <= priceRange[1];
+  const {
+    data: productsData,
+    isLoading,
+    error,
+  } = useGetAllProductQuery(queryParams);
 
-      // Category filter
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        selectedCategories.includes(product.categories);
+  const products = (productsData?.data as unknown as Product[]) || [];
+  const totalPage = productsData?.meta.totalPage;
 
-      // Stock filter
-      const matchesStock = !inStockOnly || product.isInStock;
-      const matchesDigital = !digital || product.isDigital;
-
-      return (
-        withinPriceRange && matchesCategory && matchesStock && matchesDigital
-      );
-    });
-  }, [priceRange, selectedCategories, inStockOnly, digital]);
+  // Update category query params when selected categories change
+  useEffect(() => {
+    const categoryParams = selectedCategories.map((category) => ({
+      name: "categories",
+      value: category,
+    }));
+    setSelectedCategoriesData(categoryParams);
+  }, [selectedCategories]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
@@ -48,8 +84,32 @@ const AllProduct = () => {
     );
   };
 
-  // Calculate max price for slider
-  const maxPrice = Math.max(...products.map((p) => p.price), 10);
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const searchInput = form.elements.namedItem("search") as HTMLInputElement;
+    setSearchQuery(searchInput?.value || "");
+  };
+
+  const handleDigitalFilterChange = (checked: boolean | string) => {
+    setDigitalOnly(checked === true);
+  };
+
+  const handleStockFilterChange = (checked: boolean | string) => {
+    setInStockOnly(checked === true);
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 text-center py-10">
+        Error loading products. Please try again later.
+      </div>
+    );
+  }
 
   return (
     <section className="mb-10 md:mb-20">
@@ -57,113 +117,175 @@ const AllProduct = () => {
         <h1 className="text-3xl btn-bg rounded-md mb-5 md:mb-10 text-white md:text-5xl font-bold text-center py-5 md:py-10 mt-10">
           All Products
         </h1>
-        <div className="flex gap-5">
+
+        <div className="flex flex-col md:flex-row gap-5">
           {/* Filters Sidebar */}
-          <Card className="p-6 space-y-8 bg-[#424242] text-white min-w-[250px]">
-            {/* Price Range */}
-            <div className="space-y-4">
-              <h3 className="font-medium">Price Range</h3>
-              <Slider
-                value={priceRange}
-                onValueChange={(value) => setPriceRange([value[0], value[1]])}
-                min={0}
-                max={maxPrice}
-                step={1}
-                className="w-full bg-yellow-500 text-yellow-200 font-bold rounded-md"
-              />
-              {/* <SliderTrack className="bg-transparent h-3 rounded-full">
-                <SliderRange className="bg-[#f24822] h-3 rounded-full" />
-              </SliderTrack> */}
-
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>${priceRange[0].toFixed(2)}</span>
-                <span>${priceRange[1].toFixed(2)}</span>
+          <aside className="md:min-w-[250px] order-2 md:order-1">
+            <Card className="p-6 space-y-8 bg-[#424242] text-white">
+              {/* Price Range Filter */}
+              <div className="space-y-4">
+                <h3 className="font-medium">Price Range</h3>
+                <Slider
+                  value={priceRange}
+                  onValueChange={(value) =>
+                    setPriceRange(value as [number, number])
+                  }
+                  min={PRICE_RANGE_MIN}
+                  max={PRICE_RANGE_MAX}
+                  step={100}
+                  className="w-full custom-slider"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>${priceRange[0].toLocaleString()}</span>
+                  <span>${priceRange[1].toLocaleString()}</span>
+                </div>
               </div>
-            </div>
 
-            {/* Categories */}
-            <div className="space-y-3">
-              <h3 className="font-medium">Categories</h3>
-              <div className="space-y-2">
-                {categories.map((category) => (
-                  <div key={category} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`category-${category}`}
-                      checked={selectedCategories.includes(category)}
-                      onCheckedChange={() => handleCategoryChange(category)}
-                    />
-                    <Label htmlFor={`category-${category}`}>{category}</Label>
-                  </div>
-                ))}
+              {/* Categories Filter */}
+              <div className="space-y-3 max-h-[370px] overflow-y-auto">
+                <h3 className="font-medium">Categories</h3>
+                <div className="space-y-2">
+                  {categories.map((category) => (
+                    <div key={category} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`category-${category}`}
+                        checked={selectedCategories.includes(category)}
+                        onCheckedChange={() => handleCategoryChange(category)}
+                      />
+                      <Label htmlFor={`category-${category}`}>{category}</Label>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Availability */}
-            <div className="space-y-3">
-              <h3 className="font-medium">Availability</h3>
-              <div className="space-y-2">
+              {/* Availability Filter */}
+              <div className="space-y-3">
+                <h3 className="font-medium">Availability</h3>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="in-stock"
                     checked={inStockOnly}
-                    onCheckedChange={() => setInStockOnly(!inStockOnly)}
+                    onCheckedChange={handleStockFilterChange}
                   />
                   <Label htmlFor="in-stock">In Stock Only</Label>
                 </div>
               </div>
-            </div>
-            <div className="space-y-3">
-              <h3 className="font-medium">Digital</h3>
-              <div className="space-y-2">
+
+              {/* Digital Filter */}
+              <div className="space-y-3">
+                <h3 className="font-medium">Digital</h3>
                 <div className="flex items-center space-x-2">
                   <Checkbox
-                    id="in-Digital"
-                    checked={digital}
-                    onCheckedChange={() => setDigital(!digital)}
+                    id="digital-only"
+                    checked={digitalOnly}
+                    onCheckedChange={handleDigitalFilterChange}
                   />
-                  <Label htmlFor="in-stock">In Digital Only</Label>
+                  <Label htmlFor="digital-only">Digital Only</Label>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </aside>
 
-          {/* Products Grid */}
-          <div className="mb-5 md:mb-0 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 flex-1">
-            {filteredProducts.slice(0, 8).map((product) => (
-              <div
-                key={product.productName}
-                className="border rounded-2xl h-[385px] bg-[#424242] p-3 shadow hover:shadow-lg transition-all duration-300 flex flex-col"
-              >
-                <img
-                  src={product.productUrl}
-                  alt={product.productName}
-                  className="w-full h-48 object-cover rounded-xl mb-3"
-                />
-                <h2 className="text-lg font-semibold line-clamp-1 text-white">
-                  {product.productName}
-                </h2>
-                <p className="text-sm text-gray-300 mb-1">
-                  {product.brandName}
-                </p>
-                <div className="flex items-center gap-2">
-                  <p className="text-base font-bold text-green-600">
-                    ${product.price.toFixed(2)}
-                  </p>
-                  {product.originalPrice && (
-                    <span className="text-sm text-gray-400 line-through">
-                      ${product.originalPrice.toFixed(2)}
-                    </span>
-                  )}
+          {/* Main Content */}
+          <main className="flex-1 order-1 md:order-2">
+            {/* Search Form */}
+            <form
+              onSubmit={handleSearchSubmit}
+              className="max-w-md mx-auto mb-5 md:mb-10 lg:mb-16"
+            >
+              <Label htmlFor="product-search" className="sr-only">
+                Search products
+              </Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-500"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                    />
+                  </svg>
                 </div>
-                <p className="text-sm text-gray-300 line-clamp-2 my-2 flex-1">
-                  {product.shortDescription}
-                </p>
-                <Button className="mt-2 w-full btn-bg text-sm py-2 rounded-lg transition-all">
-                  {product.isDigital ? "View Details" : "Add to Cart"}
-                </Button>
+                <input
+                  name="search"
+                  type="search"
+                  id="product-search"
+                  className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Search products..."
+                  defaultValue={searchQuery}
+                />
+                <button
+                  type="submit"
+                  className="text-white absolute end-2.5 bottom-2.5 btn-bg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+                >
+                  Search
+                </button>
               </div>
-            ))}
-          </div>
+            </form>
+
+            {/* Products Grid */}
+            <div className="mb-5  md:mb-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ">
+              {products.length > 0 ? (
+                products.slice(0, 12).map((product, idx) => (
+                  <div
+                    key={`${product._id}-${idx}`}
+                    className="rounded-2xl h-[320px] bg-[#424242] p-3 shadow hover:shadow-lg transition-all duration-300 flex flex-col"
+                  >
+                    <img
+                      src={product.productUrl}
+                      alt={product.productName}
+                      className="w-full h-48 md:h-44 lg:h-32 object-cover rounded-xl mb-3"
+                      loading="lazy"
+                    />
+                    <h2 className="text-lg font-semibold line-clamp-1 text-white">
+                      {product.productName}
+                    </h2>
+                    <p className="text-sm text-gray-300 mb-1">
+                      {product.brandName.slice(0, 15)}
+                    </p>
+                    <p className="text-base font-bold text-green-600">
+                      ${product.price.toFixed(2)}{" "}
+                      {product.originalPrice !== undefined && (
+                        <span className="text-sm text-gray-400 line-through">
+                          ${product.originalPrice.toFixed(2)}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-sm text-gray-300 line-clamp-2 my-2">
+                      {product.shortDescription.slice(0, 15)}
+                    </p>
+                    <Link
+                      className="cursor-pointer"
+                      to={`/product-details/${product._id}`}
+                    >
+                      <Button className="mt-2 w-full cursor-pointer  text-sm py-2 rounded-lg btn-bg transition-all">
+                        Recommended
+                      </Button>
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10 text-gray-400">
+                  No products match your filters
+                </div>
+              )}
+            </div>
+            <div className="flex justify-center">
+              <ResponsivePagination
+                current={parseInt(page)}
+                total={totalPage ?? 1}
+                onPageChange={(page) => setCurrentPage(page.toString())}
+              />
+            </div>
+          </main>
         </div>
       </div>
     </section>
