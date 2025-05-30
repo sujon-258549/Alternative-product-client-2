@@ -11,23 +11,20 @@ import { IoIosNotifications } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import LogoutButton from "./LogoutButton";
 import { useGetMeQuery } from "@/redux/features/auth/authApi";
+import AllUser from "../contact/AllUser";
 const DropDown = () => {
   const { data: userData } = useGetMeQuery(undefined);
 
   const user = userData?.data;
   return (
     <div className="flex gap-1">
+      <AllUser />
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          {" "}
+        <DropdownMenuTrigger className="flex items-center gap-2.5">
           <IoIosNotifications className="text-white cursor-pointer text-3xl" />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-[#424242] text-white overflow-y-auto max-h-[350px] mt-5 w-[350px]">
           <DropdownMenuSeparator />
-
-          <DropdownMenuItem>Billing</DropdownMenuItem>
-          <DropdownMenuItem>Team</DropdownMenuItem>
-          <DropdownMenuItem>Subscription</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu>
@@ -43,7 +40,7 @@ const DropDown = () => {
             className="w-10 h-10 cursor-pointer mx-auto rounded-full object-cover bg-blue-500"
           />
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="mt-4 w-[250px] bg-[#424242] text-white ">
+        <DropdownMenuContent className="mt-4 w-[250px] mr-4 bg-[#424242] text-white ">
           <DropdownMenuLabel>
             <div className="flex justify-center flex-col">
               <img
@@ -75,8 +72,11 @@ const DropDown = () => {
           <DropdownMenuItem>
             <Link to={"/my-recommended"}>My Recommended</Link>
           </DropdownMenuItem>
+          <DropdownMenuItem>
+            {/* <Link to={"/all-user"}>Chats</Link> */}
+            <AllUser />
+          </DropdownMenuItem>
 
-          <DropdownMenuItem>Subscription </DropdownMenuItem>
           <DropdownMenuSeparator className="" />
           <DropdownMenuItem className="w-full">
             <LogoutButton />

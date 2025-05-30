@@ -17,6 +17,8 @@ import UpdateProduct from "../product/UpdateProduct";
 import RecommendationFrom from "../Recomendaction/RecomendationFrom";
 import MyRecommended from "../Recomendaction/MyRecommended";
 import MyRecommendedDetails from "../AllDetails/MyRecommendedDetails";
+import UpdateRecommended from "../Recomendaction/UpdateRecommended";
+import AllUser from "../contact/AllUser";
 
 const router = createBrowserRouter([
   {
@@ -109,6 +111,30 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <RecommendationDetails />,
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/update-recommendation/:_id",
+        element: (
+          <ProtectedRoute>
+            <UpdateRecommended />,
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/contact",
+        element: (
+          <ProtectedRoute>
+            <UpdateRecommended />,
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/all-user",
+        element: (
+          <ProtectedRoute>
+            <AllUser />,
           </ProtectedRoute>
         ),
       },

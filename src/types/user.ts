@@ -11,6 +11,8 @@ export type UserTokenPayload = {
 };
 
 export type TUser = {
+  meta: any;
+  data: any;
   fullName: string;
   profileImage?: string;
   role: string;

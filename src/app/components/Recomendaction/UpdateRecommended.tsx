@@ -13,10 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { productSchema } from "./productZonValidation";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -25,19 +23,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "./category";
 import { uploadProfileImage } from "../Common/ImageUpload";
 import { toast } from "sonner";
-import {
-  useFindOneProductQuery,
-  useUpdateProductMutation,
-} from "@/redux/features/product/product";
 import { useNavigate, useParams } from "react-router";
 import { TProduct } from "@/types/product";
+import { recommendedSchema } from "./recommended";
+import { categories } from "../product/category";
+import {
+  useFindOneRecommendedQuery,
+  useUpdateMyRecommendedMutation,
+} from "@/redux/features/recommended/recommended";
 
-type ProductFormValues = z.infer<typeof productSchema>;
+type ProductFormValues = z.infer<typeof recommendedSchema>;
 
-const UpdateProduct = () => {
+const UpdateRecommended = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const { _id } = useParams();
@@ -45,14 +44,14 @@ const UpdateProduct = () => {
     data: products,
     isError,
     isLoading: isProductLoading,
-  } = useFindOneProductQuery(_id);
+  } = useFindOneRecommendedQuery(_id);
   const product = products?.data as TProduct;
   const navigate = useNavigate();
-  const [updateProduct] = useUpdateProductMutation();
+  const [updateProduct] = useUpdateMyRecommendedMutation();
   const [currentFile, setCurrentFile] = useState<File | undefined>(undefined);
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(recommendedSchema),
   });
 
   // Set form values when product data is loaded
@@ -66,7 +65,6 @@ const UpdateProduct = () => {
         currency: product?.currency,
         description: product?.description,
         shortDescription: product?.shortDescription,
-        isInStock: product?.isInStock,
         categories: product?.categories,
         weight: product?.weight,
         isDigital: product?.isDigital ? "yes" : "no",
@@ -120,7 +118,7 @@ const UpdateProduct = () => {
 
       const data = {
         ...productInfo,
-        productUrl: imageUrl || undefined,
+        recommendationImage: imageUrl || undefined,
       };
 
       const productData = {
@@ -371,28 +369,6 @@ const UpdateProduct = () => {
                   </FormItem>
                 )}
               />
-
-              {/* Is In Stock */}
-              <FormField
-                control={form.control}
-                name="isInStock"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-gray-700 p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="border-gray-500 data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="text-gray-300">
-                        Product is in stock
-                      </FormLabel>
-                    </div>
-                  </FormItem>
-                )}
-              />
             </div>
 
             {/* Short Description */}
@@ -539,4 +515,4 @@ const UpdateProduct = () => {
   );
 };
 
-export default UpdateProduct;
+export default UpdateRecommended;

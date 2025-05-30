@@ -1,4 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
+import { TUser } from "@/types/user";
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -22,6 +23,27 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: userInfo,
       }),
+    }),
+    getAllUser: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args) {
+          args.forEach((element: { name: string; value: string }) => {
+            params.append(element.name, element.value);
+          });
+        }
+        return {
+          url: "/auth",
+          method: "GET",
+          params: params,
+        };
+      },
+      transformResponse: (response: TUser) => {
+        return {
+          data: response.data,
+          meta: response.meta,
+        };
+      },
     }),
     createAccessToken: builder.mutation({
       query: (userInfo) => ({
@@ -70,4 +92,5 @@ export const {
   useForgetPasswordMutation,
   useResetPasswordMutation,
   useUpdateUserMutation,
+  useGetAllUserQuery,
 } = authApi;

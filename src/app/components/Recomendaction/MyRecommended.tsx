@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useDeleteMyProductMutation } from "@/redux/features/product/product";
 import LoadingSpinner from "../Common/LoadingSpinner";
 import ResponsivePagination from "react-responsive-pagination";
 import { FiExternalLink } from "react-icons/fi";
@@ -26,7 +25,10 @@ import {
 } from "@/components/ui/select";
 import { Link } from "react-router";
 import { categories } from "../product/category";
-import { useGetMyRecommendedQuery } from "@/redux/features/recommended/recommended";
+import {
+  useDeleteMyRecommendedMutation,
+  useGetMyRecommendedQuery,
+} from "@/redux/features/recommended/recommended";
 
 const MyRecommended = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,7 +36,7 @@ const MyRecommended = () => {
   const [digitalFilter, setDigitalFilter] = useState<string>();
   const [page, setCurrentPage] = useState<string>("1");
   const limit = "5";
-
+  const [deleteMyRecommendation] = useDeleteMyRecommendedMutation();
   // handel isDigital
   console.log(page.toString());
 
@@ -46,78 +48,6 @@ const MyRecommended = () => {
     const search =
       (form.elements.namedItem("search") as HTMLInputElement)?.value || "";
     setSearchQuery(search);
-  };
-
-  const [deleteMyProduct] = useDeleteMyProductMutation();
-
-  const handleDelete = async (productId: string) => {
-    Swal.fire({
-      title: "Confirm Deletion",
-      html: `
-      <div class="text-center">
-        <svg class="w-20 h-20 mx-auto text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-        </svg>
-        <h3 class="text-xl font-bold text-gray-800 mt-4">Are you sure?</h3>
-        <p class="text-gray-600 mt-2">This action cannot be undone</p>
-      </div>
-    `,
-      showCancelButton: true,
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
-      buttonsStyling: false,
-      customClass: {
-        confirmButton:
-          "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg mx-2 transition-all duration-300",
-        cancelButton:
-          "bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg mx-2 transition-all duration-300",
-        popup: "rounded-xl border-0 shadow-xl",
-      },
-      backdrop: `
-      rgba(0,0,0,0.4)
-      url("/images/trash-icon-animated.gif")
-      center top
-      no-repeat
-    `,
-      showClass: {
-        popup: "animate__animated animate__fadeIn animate__faster",
-      },
-      hideClass: {
-        popup: "animate__animated animate__fadeOut animate__faster",
-      },
-      background: "#ffffff",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      allowEnterKey: false,
-      reverseButtons: true,
-      focusConfirm: false,
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await deleteMyProduct(productId);
-        Swal.fire({
-          title: "Deleted!",
-          html: `
-          <div class="text-center">
-            <svg class="w-20 h-20 mx-auto text-green-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            <h3 class="text-xl font-bold text-gray-800 mt-4">Successfully deleted!</h3>
-            <p class="text-gray-600 mt-2">The item has been removed</p>
-          </div>
-        `,
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-          background: "#ffffff",
-          showClass: {
-            popup: "animate__animated animate__zoomIn animate__faster",
-          },
-          hideClass: {
-            popup: "animate__animated animate__zoomOut animate__faster",
-          },
-        });
-      }
-    });
   };
 
   const queryParams = [{ name: "searchTerm", value: searchQuery }];
@@ -155,7 +85,77 @@ const MyRecommended = () => {
 
   // Get unique categories for filter dropdown
 
-  // Filter products based on search and filters
+  // delete
+
+  const handleDelete = async (productId: string) => {
+    Swal.fire({
+      title: "Confirm Deletion",
+      html: `
+        <div class="text-center">
+          <svg class="w-20 h-20 mx-auto text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+          <h3 class="text-xl font-bold text-gray-800 mt-4">Are you sure?</h3>
+          <p class="text-gray-600 mt-2">This action cannot be undone</p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      buttonsStyling: false,
+      customClass: {
+        confirmButton:
+          "bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg mx-2 transition-all duration-300",
+        cancelButton:
+          "bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg mx-2 transition-all duration-300",
+        popup: "rounded-xl border-0 shadow-xl",
+      },
+      backdrop: `
+        rgba(0,0,0,0.4)
+        url("/images/trash-icon-animated.gif")
+        center top
+        no-repeat
+      `,
+      showClass: {
+        popup: "animate__animated animate__fadeIn animate__faster",
+      },
+      hideClass: {
+        popup: "animate__animated animate__fadeOut animate__faster",
+      },
+      background: "#ffffff",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      allowEnterKey: false,
+      reverseButtons: true,
+      focusConfirm: false,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await deleteMyRecommendation(productId);
+        Swal.fire({
+          title: "Deleted!",
+          html: `
+            <div class="text-center">
+              <svg class="w-20 h-20 mx-auto text-green-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <h3 class="text-xl font-bold text-gray-800 mt-4">Successfully deleted!</h3>
+              <p class="text-gray-600 mt-2">The item has been removed</p>
+            </div>
+          `,
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          background: "#ffffff",
+          showClass: {
+            popup: "animate__animated animate__zoomIn animate__faster",
+          },
+          hideClass: {
+            popup: "animate__animated animate__zoomOut animate__faster",
+          },
+        });
+      }
+    });
+  };
 
   return (
     <section className="container mx-auto px-4 py-8">
@@ -349,7 +349,7 @@ const MyRecommended = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Link to={`/product-update/${product._id}`}>
+                      <Link to={`/update-recommendation/${product._id}`}>
                         <Button
                           variant="outline"
                           size="sm"
