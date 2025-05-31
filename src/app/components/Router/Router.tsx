@@ -19,6 +19,10 @@ import MyRecommended from "../Recomendaction/MyRecommended";
 import MyRecommendedDetails from "../AllDetails/MyRecommendedDetails";
 import UpdateRecommended from "../Recomendaction/UpdateRecommended";
 import AllUser from "../contact/AllUser";
+import AllRecommended from "../Recomendaction/AllRecommended";
+import { ChangePasswordForm } from "../auth/ChangePasswordForm";
+import UpdateProfile from "../auth/UpdateProfile";
+import ResetPasswordPage from "../auth/ResetPasswordPage";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +65,14 @@ const router = createBrowserRouter([
         path: "/about-documentation",
         element: <DocumentationPage />,
       },
+      {
+        path: "/all-recommended",
+        element: <AllRecommended />,
+      },
+      {
+        path: "/reset-from",
+        element: <ResetPasswordPage />,
+      },
 
       {
         path: "/product-details/:_id",
@@ -71,6 +83,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <UpdateProduct />,
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/update-password",
+        element: (
+          <ProtectedRoute>
+            <ChangePasswordForm />,
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/update-profile",
+        element: (
+          <ProtectedRoute>
+            <UpdateProfile />,
           </ProtectedRoute>
         ),
       },

@@ -15,7 +15,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginSchema } from "./schema/login";
-import { useLoginMutation } from "@/redux/features/auth/authApi";
+import {
+  useForgetPasswordMutation,
+  useLoginMutation,
+} from "@/redux/features/auth/authApi";
 import { setUser } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/features/hooks";
 import { verifyToken } from "@/utility/varifyToken";
@@ -30,7 +33,7 @@ const Login = () => {
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "sujan25854@gmail.com",
+      email: "sujon258549@gmail.com",
       password: "123456",
     },
   });
@@ -61,7 +64,7 @@ const Login = () => {
           token: res.data.accessToken,
         })
       );
-
+      sessionStorage.setItem("accessToken", res.data.accessToken);
       toast.success("Login successful!", { id: toastId });
       navigate("/", { replace: true }); // Prevents going back to login
     } catch (error: any) {
@@ -73,6 +76,25 @@ const Login = () => {
       toast.error(errorMessage, { id: toastId });
     } finally {
       setIsLoading(false);
+    }
+  };
+  const [forgetPassword] = useForgetPasswordMutation();
+  const handelForGetPassword = async () => {
+    const email = form.watch("email");
+
+    if (!email) {
+      toast.error("Peace input email");
+    }
+    console.log(email);
+    const res = await forgetPassword({ email: email }).unwrap();
+    if (res.success) {
+      toast.success(res.message || "Peace check Email successful!", {
+        duration: 2000,
+      });
+    } else {
+      toast.error(res.message || "Peace check Email successful!", {
+        duration: 2000,
+      });
     }
   };
 
@@ -125,12 +147,13 @@ const Login = () => {
                 <FormItem>
                   <div className="flex justify-between items-center">
                     <FormLabel className="text-gray-300">Password</FormLabel>
-                    <Link
-                      to="/forgot-password"
-                      className="text-sm text-yellow-400 hover:underline"
+                    <Button
+                      type="button"
+                      onClick={handelForGetPassword}
+                      className="text-sm cursor-pointer text-yellow-400 hover:underline"
                     >
                       Forgot password?
-                    </Link>
+                    </Button>
                   </div>
                   <FormControl>
                     <Input

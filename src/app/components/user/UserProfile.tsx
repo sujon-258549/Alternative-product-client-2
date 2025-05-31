@@ -258,22 +258,26 @@ const UserProfile = () => {
 
         {/* Action Buttons */}
         <div className="px-6 py-4 bg-gray-700/50 border-t border-gray-600/30 flex flex-wrap justify-center gap-3">
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-5 py-2.5 btn-bg text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
-          >
-            <FaEdit />
-            Edit Profile
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-            className="px-5 py-2.5 border border-gray-500 text-white rounded-lg hover:bg-gray-600/50 transition-all flex items-center gap-2"
-          >
-            <FaLock />
-            Change Password
-          </motion.button>
+          <Link to="/update-profile">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-5 py-2.5 btn-bg cursor-pointer text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
+            >
+              <FaEdit />
+              Edit Profile
+            </motion.button>
+          </Link>
+          <Link to="/update-password">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-5 py-2.5 border cursor-pointer border-gray-500 text-white rounded-lg hover:bg-gray-600/50 transition-all flex items-center gap-2"
+            >
+              <FaLock />
+              Change Password
+            </motion.button>
+          </Link>
         </div>
       </motion.div>
     </div>

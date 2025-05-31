@@ -1,54 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "@/redux/api/baseApi";
-import { TRecommendedApi } from "@/types/recommended";
 
-const recommendedApi = baseApi.injectEndpoints({
+const contactApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createContact: builder.mutation({
-      query: (productInfo) => ({
-        url: `/recommendation/create-recommended/${productInfo.id}`,
+      query: (data) => ({
+        url: `/contact/create-contact`,
         method: "POST",
-        body: productInfo.data,
+        body: data,
       }),
-      invalidatesTags: ["recommended"],
+      invalidatesTags: ["contact"],
     }),
-
-    getAllRecommended: builder.query({
-      query: (args) => {
-        console.log(args);
-        const params = new URLSearchParams();
-        if (args) {
-          args.forEach((element: { name: string; value: string }) => {
-            params.append(element.name, element.value);
-          });
-        }
-        return {
-          url: "/recommendation",
-          method: "GET",
-          params: params,
-        };
-      },
-      transformResponse: (response: TRecommendedApi) => {
-        return {
-          data: response.data,
-          meta: response.meta,
-        };
-      },
-      providesTags: ["recommended"],
-    }),
-
-    findOneContact: builder.query({
+    findContactMe: builder.query({
       query: (id) => ({
-        url: `/recommendation/${id}`,
+        url: `/contact/contactForMe/${id}`,
         method: "GET",
       }),
+      providesTags: ["contact"],
+    }),
+    findContactHe: builder.query({
+      query: (id) => ({
+        url: `/contact/contactForHe/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["contact"],
     }),
     deleteContact: builder.mutation({
       query: (id) => ({
-        url: `/recommendation/my-recommendation/${id}`,
+        url: `/contact/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["recommended"],
+      invalidatesTags: ["contact"],
     }),
     updateContact: builder.mutation({
       query: (productInfo) => ({
@@ -56,9 +38,14 @@ const recommendedApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: productInfo.data,
       }),
-      invalidatesTags: ["recommended"],
+      invalidatesTags: ["contact"],
     }),
   }),
 });
 
-export const { useCreateContactMutation } = recommendedApi;
+export const {
+  useCreateContactMutation,
+  useFindContactHeQuery,
+  useFindContactMeQuery,
+  useDeleteContactMutation,
+} = contactApi;

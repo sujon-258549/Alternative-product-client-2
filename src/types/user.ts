@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type UserInfo = {
   Id: string;
   email: string;
@@ -13,6 +14,7 @@ export type UserTokenPayload = {
 export type TUser = {
   meta: any;
   data: any;
+  _id: string;
   fullName: string;
   profileImage?: string;
   role: string;

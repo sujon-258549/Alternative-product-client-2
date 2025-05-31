@@ -44,6 +44,7 @@ const authApi = baseApi.injectEndpoints({
           meta: response.meta,
         };
       },
+      providesTags: ["user"],
     }),
     createAccessToken: builder.mutation({
       query: (userInfo) => ({
@@ -51,6 +52,7 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: userInfo,
       }),
+      invalidatesTags: ["user"],
     }),
     forgetPassword: builder.mutation({
       query: (userInfo) => ({
@@ -58,6 +60,7 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: userInfo,
       }),
+      invalidatesTags: ["user"],
     }),
     resetPassword: builder.mutation({
       query: (userInfo) => ({
@@ -65,6 +68,7 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: userInfo,
       }),
+      invalidatesTags: ["user"],
     }),
     changePassword: builder.mutation({
       query: (userInfo) => ({
@@ -72,6 +76,7 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: userInfo,
       }),
+      invalidatesTags: ["user"],
     }),
 
     getMe: builder.query({
@@ -79,6 +84,7 @@ const authApi = baseApi.injectEndpoints({
         url: "/auth/get-me",
         method: "GET",
       }),
+      providesTags: ["user"],
     }),
   }),
 });

@@ -27,6 +27,7 @@ import { useAppSelector } from "@/redux/features/hooks";
 import { userCurrentUser } from "@/redux/features/auth/authSlice";
 import { TUser, UserTokenPayload } from "@/types/user";
 import { useGetMeQuery } from "@/redux/features/auth/authApi";
+import { useEffect } from "react";
 
 interface MenuItem {
   title: string;
@@ -68,6 +69,14 @@ const Navbar = ({
     login: { title: "Login", url: "/login" },
   },
 }: Navbar1Props) => {
+  useEffect(() => {
+    const justLoggedIn = sessionStorage.getItem("accessToken");
+    if (justLoggedIn) {
+      sessionStorage.removeItem("accessToken");
+      window.location.reload();
+    }
+  }, []);
+
   const userData = useAppSelector(userCurrentUser) as UserTokenPayload;
   const email = userData?.userInfo?.email;
   const { data } = useGetMeQuery(undefined);
@@ -77,6 +86,7 @@ const Navbar = ({
   const computedMenu = menu ?? [
     { title: "Home", url: "/" },
     { title: "All Product", url: "/all-product" },
+    { title: "All Recommendation", url: "/all-recommended" },
     ...(email ? [{ title: "Add Product", url: "/add-product" }] : []),
     { title: "About", url: "/about-page" },
   ];

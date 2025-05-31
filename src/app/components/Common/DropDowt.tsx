@@ -7,7 +7,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router";
-import { IoIosNotifications } from "react-icons/io";
 import { Button } from "@/components/ui/button";
 import LogoutButton from "./LogoutButton";
 import { useGetMeQuery } from "@/redux/features/auth/authApi";
@@ -17,12 +16,9 @@ const DropDown = () => {
 
   const user = userData?.data;
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-3">
       <AllUser />
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2.5">
-          <IoIosNotifications className="text-white cursor-pointer text-3xl" />
-        </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-[#424242] text-white overflow-y-auto max-h-[350px] mt-5 w-[350px]">
           <DropdownMenuSeparator />
         </DropdownMenuContent>
@@ -71,10 +67,6 @@ const DropDown = () => {
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Link to={"/my-recommended"}>My Recommended</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            {/* <Link to={"/all-user"}>Chats</Link> */}
-            <AllUser />
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="" />
