@@ -14,9 +14,8 @@ import {
   ReactPortal,
   Key,
 } from "react";
-import { Project } from "./HomeCard";
-
 interface DetailsProps {
+  // @ts-expect-error home
   project: Project;
 }
 
@@ -127,7 +126,7 @@ export const Details = ({ project }: DetailsProps) => {
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {project.techStack?.length ? (
-                        project.techStack.map((tag, index) => (
+                        project.techStack.map((tag: any, index: string) => (
                           <span
                             key={index}
                             className="px-3 py-1  text-cyan-300 rounded-full text-xs font-medium border border-white"

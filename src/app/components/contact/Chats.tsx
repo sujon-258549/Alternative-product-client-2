@@ -35,12 +35,11 @@ const Chats = () => {
   const [selectedUser, setSelectedUser] = useState<TUser | null>(null);
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState<ContactTab>("meContact");
-  const [isDeleting, setIsDeleting] = useState(false); // New loading state for delete
+  const [isDeleting] = useState(false); // New loading state for delete
 
   // API hooks
   const [createContact] = useCreateContactMutation();
-  const [deleteContact, { isLoading: isDeleteLoading }] =
-    useDeleteContactMutation();
+  const [deleteContact] = useDeleteContactMutation();
   const { data: getMe } = useGetMeQuery(undefined);
   const getMyData = getMe?.data;
 

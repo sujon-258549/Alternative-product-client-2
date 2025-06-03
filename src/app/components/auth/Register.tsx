@@ -34,7 +34,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [uploadStatus, setUploadStatus] = useState<{
+  const [uploadStatus] = useState<{
     loading: boolean;
     error?: string;
     url?: string;

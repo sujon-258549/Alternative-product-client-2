@@ -9,7 +9,7 @@ import { setUser } from "../features/auth/authSlice";
 // import { setUser } from "../features/auth/authSlice";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5000",
+  baseUrl: "https://altranative-product-servire.vercel.app",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.token;
@@ -30,10 +30,13 @@ const baseQueryWithRefreshToken = async (
 
   // @ts-expect-error error
   if (result.error?.data?.err?.StatusCod === 401) {
-    const res = await fetch("http://localhost:5000/auth/create-access-token", {
-      method: "POST",
-      credentials: "include",
-    });
+    const res = await fetch(
+      "https://altranative-product-servire.vercel.app/auth/create-access-token",
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
     const data = await res.json();
 
     const newAccessToken = data?.data?.accessToken;
