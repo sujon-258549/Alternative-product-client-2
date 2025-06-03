@@ -73,7 +73,7 @@ const AllRecommended = () => {
     }));
     setSelectedCategoriesData(categoryParams);
   }, [selectedCategories]);
-
+  console.log(selectedCategories);
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
       prev.includes(category)
@@ -254,8 +254,61 @@ const AllRecommended = () => {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full text-center py-10 text-gray-400">
-                  No products match your filters
+                <div className="col-span-full">
+                  <div className="flex flex-col items-center justify-center p-8 md:p-12 bg-[#424242] rounded-2xl text-center">
+                    {/* Animated sad face icon */}
+                    <div className="relative mb-6">
+                      <svg
+                        className="w-24 h-24 text-gray-300 animate-bounce"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1.5"
+                          d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                        {/* Tear drop */}
+                        <path
+                          fill="currentColor"
+                          d="M12 18c0 .5-.3.9-.7 1.2-.4.3-1 .3-1.4 0-.4-.3-.7-.7-.7-1.2h3z"
+                          className="animate-pulse opacity-70"
+                        />
+                      </svg>
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-white mb-3">
+                      No Recommendations Found
+                    </h3>
+                    <p className="text-gray-300 mb-6 max-w-md mx-auto">
+                      We couldn't find any products matching your filters. Try
+                      adjusting your search criteria or browse our full
+                      collection.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        onClick={() => {
+                          setSelectedCategories([]);
+                          setPriceRange([PRICE_RANGE_MIN, PRICE_RANGE_MAX]);
+                          setDigitalOnly(false);
+                          setSearchQuery("");
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Clear All Filters
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="text-white border-gray-400 hover:bg-gray-700"
+                      >
+                        <Link to="/all-recommended">Browse All Products</Link>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

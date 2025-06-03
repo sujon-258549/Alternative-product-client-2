@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import LoadingSpinner from "../Common/LoadingSpinner";
 import ResponsivePagination from "react-responsive-pagination";
 import { useGetRecommendedRelatedProductQuery } from "@/redux/features/recommended/recommended";
@@ -138,6 +138,11 @@ const ProductDetails = () => {
                   </div>
                 </div>
               </div>
+              <Link to={`/add-recommendation/${product._id}`}>
+                <button className="mt-2 w-full cursor-pointer text-sm py-2 rounded-lg btn-bg transition-all">
+                  Add Recommendation
+                </button>
+              </Link>
             </div>
           </div>
         </div>

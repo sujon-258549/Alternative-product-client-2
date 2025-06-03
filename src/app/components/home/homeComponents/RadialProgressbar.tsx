@@ -26,7 +26,7 @@ const RadialProgressbar = () => {
 
   return (
     <div className="container">
-      <h1 className="text-3xl  text-white md:text-5xl font-bold text-center py-5 md:py-10 mt-10">
+      <h1 className="text-shadow py-5 md:py-10 mt-10">
         Our Services Progress Bar
       </h1>
       <div className="p-0.5 mb-0 px-4 md:mb-10 lg:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>

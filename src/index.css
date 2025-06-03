@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-.btn-bg {
+/* .btn-bg {
   background-image: linear-gradient(
     to right,
     rgba(255, 255, 0, 0.662),
@@ -9,7 +9,45 @@
   );
 
   color: white;
+} */
+
+.btn-bg {
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  background: linear-gradient(to right, #6366f1, #8b5cf6, #ec4899);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
 }
+.btn-bg:hover {
+  transform: scale(1.05);
+}
+
+.text-shadow {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+  margin-top: 2.5rem;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  text-align: center;
+  color: transparent;
+  background-image: linear-gradient(to right, #6ee7b7, #d97706);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+  .text-shadow {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
 /* :root {
   --radius: 0.5rem;
   --background: oklch(1 0 0);

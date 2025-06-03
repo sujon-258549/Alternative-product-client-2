@@ -4,9 +4,7 @@ const Counter = () => {
   return (
     <div className="container">
       <div className="md:pt-10 pb-10 md:pb-20">
-        <h1 className="py-10 text-3xl md:text-4xl lg:text-5xl font-bold text-center text-white font-rancho">
-          Our Count Up
-        </h1>
+        <h1 className=" text-shadow">Our Count Up</h1>
         <div className="mx-5">
           <div className="p-0.5 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
         </div>

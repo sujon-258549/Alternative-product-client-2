@@ -23,6 +23,8 @@ import AllRecommended from "../Recomendaction/AllRecommended";
 import { ChangePasswordForm } from "../auth/ChangePasswordForm";
 import UpdateProfile from "../auth/UpdateProfile";
 import ResetPasswordPage from "../auth/ResetPasswordPage";
+import { AllCategories } from "../product/AllCategories";
+import CategoryProduct from "../product/CategoryProduct";
 
 const router = createBrowserRouter([
   {
@@ -77,6 +79,14 @@ const router = createBrowserRouter([
       {
         path: "/product-details/:_id",
         element: <ProductDetails />,
+      },
+      {
+        path: "/all-category",
+        element: <AllCategories />,
+      },
+      {
+        path: "/relevant-category-product/:name",
+        element: <CategoryProduct />,
       },
       {
         path: "/product-update/:_id",

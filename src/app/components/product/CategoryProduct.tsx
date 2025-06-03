@@ -1,30 +1,49 @@
 import { Button } from "@/components/ui/button";
-import ShowAllProductButton from "./ShowAllProductButton";
 import { useGetAllProductQuery } from "@/redux/features/product/product";
-import LoadingSpinner from "../../Common/LoadingSpinner";
-import { Link } from "react-router";
+import { Link, useParams } from "react-router";
+import LoadingSpinner from "../Common/LoadingSpinner";
+import ResponsivePaginationComponent from "react-responsive-pagination";
+import { useEffect, useState } from "react";
+import NoProductFound from "./NoProductFound";
 
-const HomeCard = () => {
-  const { data: productsData, isLoading } = useGetAllProductQuery([
-    {
-      name: "limit",
-      value: "12",
-    },
-  ]);
+const CategoryProduct = () => {
+  const { name } = useParams();
+  const limit = "6";
+  const [page, setCurrentPage] = useState<string>("1");
+
+  // Build queryParams as a single array/object to pass as the first argument
+  const queryParams: { name: string; value: string }[] = [];
+  if (name) {
+    queryParams.push({ name: "categories", value: name });
+  }
+  if (page) {
+    queryParams.push({ name: "page", value: page });
+  }
+  if (limit) {
+    queryParams.push({ name: "limit", value: limit });
+  }
+
+  const { data: productsData, isLoading } = useGetAllProductQuery(queryParams);
+
+  useEffect(() => {
+    // No need to update queryParams here, as it's built on each render
+  }, [name, page, limit]);
+
   console.log(productsData);
   const products = productsData?.data;
+  const totalPage = productsData?.meta?.totalPage;
   if (isLoading) {
     return <LoadingSpinner />;
   }
+
   return (
     <div className="container">
-      <div className="">
-        <h1 className="text-shadow ">Product</h1>
-      </div>
-      <div className="p-0.5  px-4 mb-10 lg:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
+      <h1 className="text-shadow">{name} Category Products</h1>
+
+      <div className="p-0.5  px-4  mb-10  lg:mb-16 max-w-md mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
       <div className=" mb-5 md:mb-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
-        {products &&
-          products.slice(0, 12).map((product, idx) => (
+        {Array.isArray(products) && products.length > 0 ? (
+          products.map((product, idx) => (
             <div
               key={idx}
               className="rounded-2xl  bg-[#424242] p-3 shadow hover:shadow-lg transition-all duration-300 flex flex-col"
@@ -51,20 +70,27 @@ const HomeCard = () => {
               </p>
               <Link
                 className="cursor-pointer"
-                to={`product-details/${product._id}`}
+                to={`/product-details/${product._id}`}
               >
                 <Button className="mt-2 w-full cursor-pointer  text-sm py-2 rounded-lg btn-bg transition-all">
                   Recommended
                 </Button>
               </Link>
             </div>
-          ))}
+          ))
+        ) : (
+          <NoProductFound categoryName={name} />
+        )}
       </div>
-      <div className="flex justify-center items-center">
-        {products && products.length >= 12 && <ShowAllProductButton />}
+      <div className="flex justify-center">
+        <ResponsivePaginationComponent
+          current={parseInt(page)}
+          total={totalPage ?? 1}
+          onPageChange={(page) => setCurrentPage(page.toString())}
+        />
       </div>
     </div>
   );
 };
 
-export default HomeCard;
+export default CategoryProduct;

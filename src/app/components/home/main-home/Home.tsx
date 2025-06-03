@@ -1,4 +1,5 @@
 import Banner from "../homeComponents/Banner";
+import { CategorySection } from "../homeComponents/CategorySection";
 import Counter from "../homeComponents/Counter";
 import HomeCard from "../homeComponents/HomeCard";
 import RadialProgressbar from "../homeComponents/RadialProgressbar";
@@ -10,6 +11,7 @@ const Home = () => {
     <div>
       <Slider />
       <HomeCard />
+      <CategorySection />
       <RadialProgressbar />
       <Banner />
       <Counter />

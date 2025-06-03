@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import LoadingSpinner from "../Common/LoadingSpinner";
 import ResponsivePagination from "react-responsive-pagination";
 import { useGetRecommendedRelatedProductQuery } from "@/redux/features/recommended/recommended";
@@ -179,9 +179,11 @@ const MyDetails = () => {
                 <p className="text-sm text-gray-300 line-clamp-2 my-2">
                   {recommendation.shortDescription.slice(0, 20)}
                 </p>
-                <button className="mt-2 w-full cursor-pointer text-sm py-2 rounded-lg btn-bg transition-all">
-                  Details
-                </button>
+                <Link to={`/my-recommended-Details/${recommendation._id}`}>
+                  <button className="mt-2 w-full cursor-pointer text-sm py-2 rounded-lg btn-bg transition-all">
+                    Details
+                  </button>
+                </Link>
               </div>
             ))
           ) : (

@@ -3,19 +3,19 @@ import ShowAllProductButton from "./ShowAllProductButton";
 const Banner = () => {
   return (
     <div className="container">
-      <div className="md:pt-28 md:px-0 px-5 md:mt-0 mt-10">
+      <div className="md:pt-16  md:px-0 px-5 mt-16">
         <div className=" w-full md:w-[80%] lg:w-[70%] mx-auto pb-8 md:pb-12">
           <h1
             data-aos-duration="1000"
             data-aos="fade-right"
-            className="kurali-font text-3xl text-white md:text-5xl font-bold text-center"
+            className="text-shadow"
           >
             Banner{" "}
             <span className="">
               <span className="">section</span>
             </span>
           </h1>
-          <div className="p-0.5 max-w-md mt-8 mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
+          <div className="p-0.5 max-w-md mt-2 mx-auto bg-gradient-to-r from-pink-200 via-purple-200 to-indigo-200 rounded-lg backdrop-blur-sm"></div>
           <p
             data-aos-duration="1000"
             data-aos="fade-left"
